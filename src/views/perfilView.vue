@@ -6,41 +6,31 @@
         <b-col lg="3" md="4" sm="6" class="sticky-top">
           <menulateralComponent class="menu"></menulateralComponent>
         </b-col>
-        <b-col lg="7" md="5" >
-          <datetimeComponent></datetimeComponent>
-          <cardsprocessosComponent></cardsprocessosComponent>
-          <homeprocessosComponent></homeprocessosComponent>
+        <b-col lg="5" md="5">
+         <edicaouserComponent></edicaouserComponent>
         </b-col>
-      </b-row> 
+      </b-row>
     </b-container>
     <rodapeComponent></rodapeComponent>
   </div>
 </template>
-
 <script>
 import cabecalhoComponent from "@/components/cabecalhoComponent.vue";
 import menulateralComponent from "@/components/menulateralComponent.vue";
-import datetimeComponent from "@/components/datetimeComponent.vue";
-import cardsprocessosComponent from "@/components/cardsprocessosComponent.vue";
-import homeprocessosComponent from "@/components/homeprocessosComponent.vue";
 import rodapeComponent from "@/components/rodapeComponent.vue";
+import edicaouserComponent from "@/components/edicaouserComponent.vue";
 export default {
-  name: "homeView",
+  name: "perfilView",
   components: {
     cabecalhoComponent,
     menulateralComponent,
-    datetimeComponent,
-    cardsprocessosComponent,
-    homeprocessosComponent,
-    rodapeComponent 
+    rodapeComponent,
+    edicaouserComponent,
   },
 };
 </script>
-
 <style scoped>
-* {
-  padding: 0;
-  margin: 0;
+h2 {
+margin-top: 30px;
 }
-
 </style>

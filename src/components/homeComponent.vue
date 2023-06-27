@@ -11,28 +11,28 @@
           <cardsprocessosComponent></cardsprocessosComponent>
           <homeprocessosComponent></homeprocessosComponent>
         </b-col>
-      </b-row> 
+
+      </b-row>
+     
+      
     </b-container>
-    <rodapeComponent></rodapeComponent>
   </div>
 </template>
 
 <script>
-import cabecalhoComponent from "@/components/cabecalhoComponent.vue";
-import menulateralComponent from "@/components/menulateralComponent.vue";
-import datetimeComponent from "@/components/datetimeComponent.vue";
-import cardsprocessosComponent from "@/components/cardsprocessosComponent.vue";
-import homeprocessosComponent from "@/components/homeprocessosComponent.vue";
-import rodapeComponent from "@/components/rodapeComponent.vue";
+import cabecalhoComponent from "./cabecalhoComponent.vue";
+import menulateralComponent from "./menulateralComponent.vue";
+import datetimeComponent from "./datetimeComponent.vue";
+import cardsprocessosComponent from "./cardsprocessosComponent.vue";
+import homeprocessosComponent from "./homeprocessosComponent.vue";
 export default {
-  name: "homeView",
+  name: "homeComponent",
   components: {
     cabecalhoComponent,
     menulateralComponent,
     datetimeComponent,
     cardsprocessosComponent,
-    homeprocessosComponent,
-    rodapeComponent 
+    homeprocessosComponent 
   },
 };
 </script>

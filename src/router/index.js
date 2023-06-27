@@ -1,23 +1,41 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import loginComponent from '../components/loginComponent.vue'
+import homeView from '@/views/homeView.vue'
+import perfilView from '@/views/perfilView.vue'
+import cadastrousuarioView from '@/views/cadastrousuarioView.vue'
+import cadastroprocessoView from '@/views/cadastroprocessoView.vue'
+
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'login',
+    component: loginComponent
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+    path: '/home',
+    name: 'home',
+    component: homeView
+  },
+  {
+    path: '/perfil',
+    name: 'perfil',
+    component: perfilView
+  },
+  {
+    path: '/cadastro/usuario',
+    name: 'cadastrousuario',
+    component: cadastrousuarioView,
+  },
+  {
+    path: '/cadastro/processo',
+    name: 'cadastroprocesso',
+    component: cadastroprocessoView
+  },
+  
 ]
 
 const router = new VueRouter({
@@ -25,5 +43,10 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  document.title = 'ADVORG';
+  next();
+});
 
 export default router
