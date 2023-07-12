@@ -5,6 +5,8 @@ import homeView from '@/views/homeView.vue'
 import perfilView from '@/views/perfilView.vue'
 import cadastrousuarioView from '@/views/cadastrousuarioView.vue'
 import cadastroprocessoView from '@/views/cadastroprocessoView.vue'
+import processosView from '@/views/processosView.vue'
+import usuariosView from '@/views/usuariosView.vue'
 
 
 Vue.use(VueRouter)
@@ -34,6 +36,18 @@ const routes = [
     path: '/cadastro/processo',
     name: 'cadastroprocesso',
     component: cadastroprocessoView
+  },
+  {
+    path: '/processos',
+    name: 'processos',
+    component: processosView
+
+  },
+  {
+    path: '/usuarios',
+    name: 'usuarios',
+    component: usuariosView
+
   },
   
 ]

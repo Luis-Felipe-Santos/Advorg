@@ -6,33 +6,34 @@
         <b-col lg="3" md="4" sm="6" class="sticky-top">
           <menulateralComponent class="menu"></menulateralComponent>
         </b-col>
-        <b-col lg="5" md="5">
-          <cadastroprocessoComponent></cadastroprocessoComponent>
+        <b-col lg="7" md="5">
+          <processosVue></processosVue>
         </b-col>
       </b-row>
     </b-container>
     <rodapeComponent></rodapeComponent>
   </div>
 </template>
+  
 <script>
 import cabecalhoComponent from "@/components/cabecalhoComponent.vue";
 import menulateralComponent from "@/components/menulateralComponent.vue";
 import rodapeComponent from "@/components/rodapeComponent.vue";
-import cadastroprocessoComponent from "@/components/cadastroprocessoComponent.vue";
-
+import processosVue from "@/components/processosVue.vue";
 export default {
-  name: "cadastroView",
+  name: "processosView",
   components: {
     cabecalhoComponent,
     menulateralComponent,
     rodapeComponent,
-    cadastroprocessoComponent,
+    processosVue,
   },
 };
 </script>
+  
 <style scoped>
-h2 {
-  margin-top: 30px;
+* {
+  padding: 0;
+  margin: 0;
 }
 </style>
-  

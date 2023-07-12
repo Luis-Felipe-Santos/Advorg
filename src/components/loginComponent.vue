@@ -2,7 +2,7 @@
     <div id="app">
         <div class="logo">
             <div class="conteudos">
-                <img src="../assets/logo.png" alt="ADVORG">
+                <img src="../assets/logo1.png" alt="ADVORG">
             </div>
         </div>
         <div class="telaLogin">

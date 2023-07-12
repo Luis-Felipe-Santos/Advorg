@@ -5,7 +5,7 @@
           Início</router-link></b-nav-item>
       <b-nav-item><router-link class="router-link-no-underline" to="/perfil"><b-icon icon="person-fill"></b-icon>
           Perfil</router-link></b-nav-item>
-      <b-nav-item><b-icon icon="journal"></b-icon>Cadastro<b-icon icon="caret-left-fill" v-b-toggle.rotation
+      <b-nav-item><b-icon icon="journal"></b-icon> Cadastro<b-icon icon="caret-left-fill" v-b-toggle.rotation
           @click="rotateIcon" :class="{ 'rotate': rotated }" class="icon_seta"></b-icon></b-nav-item>
       <b-collapse :visible.sync="rotated">
 
@@ -18,7 +18,7 @@
       </b-collapse>
       <b-nav-item><router-link class="router-link-no-underline" to="/processos"><b-icon icon="briefcase-fill"></b-icon>
           Processos</router-link></b-nav-item>
-      <b-nav-item><b-icon icon="people-fill"></b-icon> Usuarios</b-nav-item>
+      <b-nav-item><router-link class="router-link-no-underline" to="/usuarios"><b-icon icon="people-fill"></b-icon> Usuarios</router-link></b-nav-item>
     </b-nav>
   </div>
 </template>
@@ -54,6 +54,11 @@ export default {
 
 .router-link-no-underline {
   text-decoration: none;
+  color: #000;
+}
+
+.router-link-no-underline:hover{
+  color: blue ;
 }
 
 .nav-item {
@@ -61,6 +66,8 @@ export default {
   border-bottom: 1px dashed black;
   justify-content: start;
 }
+
+
 
 .rounded {
   border-radius: 25px;
