@@ -24,8 +24,8 @@
           <b-col cols="3">
             <b-form-group label="Data">
               <b-form-datepicker v-model="selectedDate"
-                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }"
-                class="form-control"></b-form-datepicker>
+                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }" class="form-control"
+               ></b-form-datepicker>
             </b-form-group>
           </b-col>
           <b-col cols="3" class="mb-5">
@@ -59,7 +59,7 @@ export default {
       input2: "",
       input3: "",
       input4: "",
-      selectedDate: null,
+      selectedDate: null, 
 
       fields: [
         {
@@ -116,6 +116,7 @@ export default {
     this.originalItems = [...this.items];
   },
   methods: {
+    
     submitForm() {
       // Filter the items array based on the input values
       const filteredItems = this.originalItems.filter(item => {
@@ -132,10 +133,10 @@ export default {
           item.situacao.toLowerCase().includes(searchInput4)
         );
       });
-     
+
       this.items = filteredItems;
     },
-  
+
     resetForm() {
       // Clear the input values
       this.input1 = '';

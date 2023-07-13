@@ -17,28 +17,95 @@
                             <b-form-input id="input-2" type="password" placeholder="Digite sua senha"
                                 required></b-form-input>
                         </b-form-group>
-                        <p class="esqueci">Esqueceu sua senha?</p>
+                        <p class="esqueci" @click="showForgotPassword = true">Esqueceu sua senha?</p>
                         <div class="button">
                             <b-button class="w-50 mt-2 text-normal" type="submit" variant="primary"
                                 @click="login">Entrar</b-button>
-
                         </div>
                     </b-form>
                     <div class="criar">
                         <p>Ainda não tem uma conta?</p>
-                        <p class="criar-conta">Criar Conta</p>
+                        <p class="criar-conta" @click="showCreateAccount = true">Criar Conta</p>
+
                     </div>
                 </b-card>
             </div>
         </div>
+        <b-modal v-model="showForgotPassword" title="Esqueceu a senha" hide-footer centered @hide="resetForgotPassword">
+            <p>Informe seu email para recuperar sua senha.</p>
+            <b-form>
+                <b-form-group id="input-group-3" label="Email:" label-for="input-3">
+                    <b-form-input id="input-3" type="email" placeholder="Digite seu email" required></b-form-input>
+                </b-form-group>
+                <div class="button">
+                    <b-button class="w-50 mt-2 text-normal" type="submit" variant="primary"
+                        @click="recoverPassword">Recuperar senha</b-button>
+                </div>
+            </b-form>
+        </b-modal>
+        <b-modal v-model="showSuccessMessage" title="Sucesso" hide-footer @hide="resetSuccessMessage">
+            <p>Email de recuperação enviado com sucesso!</p>
+        </b-modal>
+        <b-modal v-model="showCreateAccount" title="Criar uma conta" hide-footer @hide="resetCreateAccount">
+            <p>Preencha o formulário abaixo para criar uma nova conta:</p>
+            <b-form>
+                <b-form-group id="input-group-4" label="Nome:" label-for="input-4">
+                    <b-form-input id="input-4" type="text" placeholder="Digite seu nome" required></b-form-input>
+                </b-form-group>
+                <b-form-group id="input-group-5" label="Email:" label-for="input-5">
+                    <b-form-input id="input-5" type="email" placeholder="Digite seu email" required></b-form-input>
+                </b-form-group>
+                <b-form-group id="input-group-6" label="Senha:" label-for="input-6">
+                    <b-form-input id="input-6" type="password" placeholder="Digite sua senha" required></b-form-input>
+                </b-form-group>
+                <div class="button">
+                    <b-button class="w-50 mt-2 text-normal" type="submit" variant="primary"
+                        @click="createAccount">Criar conta</b-button>
+                </div>
+            </b-form>
+        </b-modal>
     </div>
 </template>
+
 <script>
 export default {
     name: "loginComponent",
+    data() {
+        return {
+            showForgotPassword: false,
+            showSuccessMessage: false,
+            showCreateAccount: false
+        };
+    },
     methods: {
         login() {
             this.$router.push('/home');
+        },
+        recoverPassword() {
+            // Lógica para recuperar a senha
+
+            // Exibir mensagem de sucesso após recuperar a senha
+            this.showForgotPassword = false;
+            this.showSuccessMessage = true;
+        },
+        resetForgotPassword() {
+            // Reseta o estado da página de "Esqueceu a senha"
+            // caso o modal seja fechado sem recuperar a senha
+        },
+        resetSuccessMessage() {
+            // Reseta o estado da mensagem de sucesso
+        },
+        createAccount() {
+            // Lógica para criar uma nova conta
+
+            // Fechar o modal de criar conta
+            this.showCreateAccount = false;
+
+            // Redirecionar o usuário para a página de login ou realizar outras ações necessárias
+        },
+        resetCreateAccount() {
+            // Reseta o estado da página de "Criar uma conta"
+            // caso o modal seja fechado sem criar a conta
         }
     }
 }

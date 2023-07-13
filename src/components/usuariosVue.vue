@@ -17,6 +17,7 @@
               <th>Login</th>
               <th>Cadastro</th>
               <th>Situação</th>
+              <th>Permissão</th>
               <th>Eventos</th>
             </tr>
           </thead>
@@ -26,6 +27,7 @@
               <td>{{ item.Login }}</td>
               <td>{{ formatarData(item.Cadastro) }}</td>
               <td>{{ item.Situação }}</td>
+              <td>{{ item.Permissão}}</td>
               <td>
                 <b-icon @click="visualizar(item)" class="icon" icon="eye"></b-icon>
                 <b-icon @click="editar(item)" class="icon" icon="pencil-square"></b-icon>
@@ -46,7 +48,7 @@
         searchNome: "",
         searchLogin: "",
         items: [
-          { id: 1, Nome: "João", Login: "joao123", Cadastro: "2022-01-01", Situação: "Ativo" },
+          { id: 1, Nome: "João", Login: "joao123", Cadastro: "2022-01-01", Permissão: "Master", Situação: "Ativo" },
           { id: 2, Nome: "Maria", Login: "maria456", Cadastro: "2022-02-02", Situação: "Inativo" },
           { id: 3, Nome: "Pedro", Login: "pedro789", Cadastro: "2022-03-03", Situação: "Ativo" },
           { id: 4, Nome: "Ana", Login: "ana321", Cadastro: "2022-04-04", Situação: "Inativo" }
