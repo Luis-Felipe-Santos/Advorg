@@ -22,6 +22,10 @@
                             <b-button class="w-50 mt-2 text-normal" type="submit" variant="primary"
                                 @click="login">Entrar</b-button>
                         </div>
+                        <div class="button">
+                            <b-button class="w-100 mt-2 text-normal" type="submit" variant="outline-primary"
+                                @click="login"><b-icon class="google" icon="google"></b-icon>Entrar com o Google</b-button>
+                        </div>
                     </b-form>
                     <div class="criar">
                         <p>Ainda não tem uma conta?</p>
@@ -48,19 +52,23 @@
         </b-modal>
         <b-modal v-model="showCreateAccount" title="Criar uma conta" hide-footer @hide="resetCreateAccount">
             <p>Preencha o formulário abaixo para criar uma nova conta:</p>
-            <b-form>
+            <b-form @submit.prevent="createAccount">
                 <b-form-group id="input-group-4" label="Nome:" label-for="input-4">
-                    <b-form-input id="input-4" type="text" placeholder="Digite seu nome" required></b-form-input>
+                    <b-form-input v-model="name" id="input-4" type="text" placeholder="Digite seu nome"
+                        required></b-form-input>
                 </b-form-group>
                 <b-form-group id="input-group-5" label="Email:" label-for="input-5">
-                    <b-form-input id="input-5" type="email" placeholder="Digite seu email" required></b-form-input>
+                    <b-form-input v-model="email" id="input-5" type="email" placeholder="Digite seu email"
+                        required></b-form-input>
                 </b-form-group>
                 <b-form-group id="input-group-6" label="Senha:" label-for="input-6">
-                    <b-form-input id="input-6" type="password" placeholder="Digite sua senha" required></b-form-input>
+                    <b-form-input v-model="password" id="input-6" :type="showPassword ? 'text' : 'password'"
+                        placeholder="Digite sua senha" required></b-form-input>
                 </b-form-group>
+                <b-form-checkbox v-model="showPassword">Mostrar Senha</b-form-checkbox>
                 <div class="button">
-                    <b-button class="w-50 mt-2 text-normal" type="submit" variant="primary"
-                        @click="createAccount">Criar conta</b-button>
+                    <b-button class="w-50 mt-2 text-normal" type="submit" variant="primary">Criar
+                        conta</b-button>
                 </div>
             </b-form>
         </b-modal>
@@ -68,13 +76,20 @@
 </template>
 
 <script>
+
+import axios from 'axios';
+
 export default {
     name: "loginComponent",
     data() {
         return {
+            name: '',
+            email: '',
+            password: '',
             showForgotPassword: false,
             showSuccessMessage: false,
-            showCreateAccount: false
+            showCreateAccount: false,
+            showPassword: false,
         };
     },
     methods: {
@@ -95,13 +110,29 @@ export default {
         resetSuccessMessage() {
             // Reseta o estado da mensagem de sucesso
         },
-        createAccount() {
+        async createAccount() {
             // Lógica para criar uma nova conta
+            try {
+                const response = await axios.post('http://localhost:2000/api/register', {
+                    name: this.name,
+                    email: this.email,
+                    password: this.password
+                });
+                alert(response.data.message);
 
+                this.name = '';
+                this.email = '';
+                this.password = '';
+            } catch (error) {
+                console.error('Erro ao registrar usuário:', error);
+            }
             // Fechar o modal de criar conta
             this.showCreateAccount = false;
 
             // Redirecionar o usuário para a página de login ou realizar outras ações necessárias
+        },
+        togglePassword() {
+            this.showPassword = !this.showPassword;
         },
         resetCreateAccount() {
             // Reseta o estado da página de "Criar uma conta"
@@ -158,7 +189,10 @@ export default {
 .button {
     display: flex;
     justify-content: center;
+}
 
+.google {
+    margin-right: 10px;
 }
 
 .esqueci {
