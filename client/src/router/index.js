@@ -9,6 +9,8 @@ import processosView from '@/views/processosView.vue'
 import usuariosView from '@/views/usuariosView.vue'
 
 
+
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -57,10 +59,4 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-
-router.beforeEach((to, from, next) => {
-  document.title = 'ADVORG';
-  next();
-});
-
 export default router

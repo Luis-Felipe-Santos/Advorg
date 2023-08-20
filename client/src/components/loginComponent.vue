@@ -9,19 +9,21 @@
             <div class="custom-card">
                 <b-card title="Entrar">
                     <p>Entre com suas credenciais para acessar o ADVORG.</p>
-                    <b-form>
+                    <b-form @submit.prevent="login">
                         <b-form-group id="input-group-1" label="Email:" label-for="input-1">
-                            <b-form-input id="input-1" type="email" placeholder="Digite seu email" required></b-form-input>
+                            <b-form-input v-model="emailLogin" id="input-1" type="email" placeholder="Digite seu email" required></b-form-input>
                         </b-form-group>
                         <b-form-group class="mt-2" id="input-group-2" label="Senha:" label-for="input-2">
-                            <b-form-input id="input-2" type="password" placeholder="Digite sua senha"
+                            <b-form-input v-model="passwordLogin" id="input-2" type="password" placeholder="Digite sua senha"
                                 required></b-form-input>
                         </b-form-group>
                         <p class="esqueci" @click="showForgotPassword = true">Esqueceu sua senha?</p>
                         <div class="button">
-                            <b-button class="w-50 mt-2 text-normal" type="submit" variant="primary"
-                                @click="login">Entrar</b-button>
+                            <b-button class="w-50 mt-2 text-normal" type="submit" variant="primary">Entrar</b-button>
                         </div>
+                        <b-alert v-if="loginError" variant="danger">
+                            Erro ao fazer login. Por favor verifique suas credenciais.
+                        </b-alert>
                         <div class="button">
                             <b-button class="w-100 mt-2 text-normal" type="submit" variant="outline-primary"
                                 @click="login"><b-icon class="google" icon="google"></b-icon>Entrar com o Google</b-button>
@@ -76,9 +78,6 @@
 </template>
 
 <script>
-
-import axios from 'axios';
-
 export default {
     name: "loginComponent",
     data() {
@@ -86,16 +85,40 @@ export default {
             name: '',
             email: '',
             password: '',
+            emailLogin:'',
+            passwordLogin: '',
             showForgotPassword: false,
             showSuccessMessage: false,
             showCreateAccount: false,
             showPassword: false,
+            loginError: false
         };
     },
     methods: {
-        login() {
-            this.$router.push('/home');
+        async login() {
+            console.log('Login method started');
+            try {
+                const response = await this.$api.post('/login', {
+                    email: this.emailLogin,
+                    password: this.passwordLogin,
+                });
+
+                console.log('Response:', response.data);
+
+                if (response.data.status) {
+                    console.log('Successful login');
+                    localStorage.setItem('authToken', response.data.token);
+                    this.$router.push('/home');
+                } else {
+                    console.log('Failed login');
+                    this.loginError = true;
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+            }
+
         },
+
         recoverPassword() {
             // Lógica para recuperar a senha
 
@@ -111,32 +134,39 @@ export default {
             // Reseta o estado da mensagem de sucesso
         },
         async createAccount() {
-            // Lógica para criar uma nova conta
             try {
-                const response = await axios.post('http://localhost:2000/api/register', {
+                const response = await this.$api.post('/register', {
                     name: this.name,
                     email: this.email,
                     password: this.password
                 });
-                alert(response.data.message);
+                this.responseData = response.data;
 
                 this.name = '';
                 this.email = '';
                 this.password = '';
+
+                alert("Usuário Registrado com sucesso");
+
             } catch (error) {
-                console.error('Erro ao registrar usuário:', error);
+                console.error('Erro ao criar a conta:', error);
+                alert("O email informado já possui cadastro");
             }
+
             // Fechar o modal de criar conta
             this.showCreateAccount = false;
 
-            // Redirecionar o usuário para a página de login ou realizar outras ações necessárias
         },
         togglePassword() {
             this.showPassword = !this.showPassword;
         },
         resetCreateAccount() {
-            // Reseta o estado da página de "Criar uma conta"
-            // caso o modal seja fechado sem criar a conta
+            this.name = '';
+            this.email = '';
+            this.password = '';
+
+            this.showPassword = false;
+            this.showCreateAccount = false;
         }
     }
 }

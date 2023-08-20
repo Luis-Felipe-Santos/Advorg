@@ -1,34 +1,34 @@
-import express from 'express';
-import bodyParser from 'body-parser';
+import express, { Request, Response, ErrorRequestHandler } from 'express';
+import path from 'path';
 import dotenv from 'dotenv';
-import cors from 'cors'; 
-import { sequelize } from '../instances/mysql'; // Adjust path as needed
-import { User } from '../models/User'; // Adjust path as needed
+import cors from 'cors';
+import apiRoutes from './routes/api';
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const server = express();
 
-app.use(cors());
+server.use(cors());
 
-app.use(bodyParser.json());
+server.use(express.static(path.join(__dirname, '../public')));
+server.use(express.urlencoded({ extended: true }));
+server.use(express.json());
 
-app.post('/api/register', async (req, res) => {
-  const { name, email, password } = req.body;
+server.use(apiRoutes);
 
-  try {
-    await User.create({ name, email, password });
-    
-    res.status(201).json({ message: 'Usuário Registrado com sucesso!' });
-  } catch (error) {
-    console.error('Erro ao registrar usuário:', error);
-    res.status(500).json({ message: 'Error registering user' });
-  }
+server.use((req: Request, res: Response) => {
+    res.status(404);
+    res.json({ error: 'Endpoint não encontrado.' });
 });
 
-sequelize.sync().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+    res.status(400); // Bad Request
+    console.log(err);
+    res.json({ error: 'Ocorreu algum erro.' });
+}
+server.use(errorHandler);
+
+
+server.listen(2000, () => {
+    console.log('API server is running on port 2000');
   });
-});
