@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { hash, compare } from "bcrypt";
-import JWT from "jsonwebtoken";
 import dotenv from "dotenv";
-import { User } from "../models/User";
+import { User, UserInstance } from "../models/User";
 import { generateToken } from "../config/passport";
+
 
 dotenv.config();
 
 export const register = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  const { name, email, cidade, password } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !email || !cidade || !password) {
     return res.status(400).json({
       message:
-        "Erro ao registrar usuário: Nome, e-mail e/ou senha não fornecidos.",
+        "Erro ao registrar usuário: Nome, e-mail, cidade e/ou senha não fornecidos.",
     });
   }
   try {
@@ -24,6 +24,7 @@ export const register = async (req: Request, res: Response) => {
       const newUser = await User.create({
         name,
         email,
+        cidade,
         password: passwordHash,
       });
       const token = generateToken({ id: newUser.id });
@@ -57,7 +58,11 @@ export const login = async (req: Request, res: Response) => {
       const verifyPassword = await compare(password, user.password);
 
       if (verifyPassword) {
-        const token = generateToken({ id: user.id });
+        const token = generateToken({
+          id: user.id,
+          name: user.name,
+          cidade: user.cidade,
+        });
         return res.json({ status: true, token });
       }
     }
@@ -66,13 +71,14 @@ export const login = async (req: Request, res: Response) => {
   res.json({ status: false });
 };
 
-export const list = async (req: Request, res: Response) => {
-  let users = await User.findAll();
-  let list: string[] = [];
-
-  for (let i in users) {
-    list.push(users[i].email);
+export const getProfile = async (req: Request, res: Response) => {
+  try {
+    // Recuperar os dados do usuário logado da requisição
+    const user = req.user;
+    // Retornar os dados do usuário como resposta JSON
+    res.json(user);
+  } catch (error) {
+    console.error("Erro ao obter dados do usuário:", error);
+    res.status(500).json({ error: "Erro ao obter dados do usuário" });
   }
-
-  res.json({ list });
 };

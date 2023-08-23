@@ -11,7 +11,7 @@ const notAuthorizedJson = { status: 401, message: "Não autorizado" };
 
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_Secret as string,
+  secretOrKey: process.env.JWT_SECRET as string,
 };
 
 passport.use(

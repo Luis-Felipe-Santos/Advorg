@@ -1,9 +1,13 @@
 <template>
   <div>
     <b-nav>
-      <b-nav-item><router-link class="router-link-no-underline" to="/home">Logo</router-link></b-nav-item>
-      <b-nav-item @click.prevent="perfil"><b-icon icon="pencil"></b-icon> {{ name }} Cidade:
-        {{ cidade }}</b-nav-item
+      <b-nav-item
+        ><router-link class="router-link-no-underline" to="/home"
+          >Logo</router-link
+        ></b-nav-item
+      >
+      <b-nav-item @click.prevent="perfil"
+        ><b-icon icon="pencil"></b-icon> {{ name }} Cidade: {{ cidade }}</b-nav-item
       >
       <b-nav-item
         ><b-icon icon="book"></b-icon> Manual de utilização</b-nav-item
@@ -16,12 +20,13 @@
 </template>
 
 <script>
+import jwtDecode from "jwt-decode";
 export default {
   name: "cabecalhoComponent",
   data() {
     return {
-      name: "Luis Felipe dos Santos",
-      cidade: "Poço Fundo",
+      name: "",
+      cidade: ""
     };
   },
   methods: {
@@ -35,6 +40,15 @@ export default {
       this.$router.push("/");
     },
   },
+  mounted() {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      this.name = decodedToken.name;
+      this.cidade = decodedToken.cidade;
+
+    }
+  },
 };
 </script>
 
@@ -46,10 +60,9 @@ export default {
 
 .nav {
   justify-content: space-between;
-  background-color: #2B59BD;
+  background-color: #2b59bd;
   height: 80px;
 }
-
 
 .nav-item {
   display: flex;

@@ -11,11 +11,12 @@
                     <p>Entre com suas credenciais para acessar o ADVORG.</p>
                     <b-form @submit.prevent="login">
                         <b-form-group id="input-group-1" label="Email:" label-for="input-1">
-                            <b-form-input v-model="emailLogin" id="input-1" type="email" placeholder="Digite seu email" required></b-form-input>
+                            <b-form-input v-model="emailLogin" id="input-1" type="email" placeholder="Digite seu email"
+                                required></b-form-input>
                         </b-form-group>
                         <b-form-group class="mt-2" id="input-group-2" label="Senha:" label-for="input-2">
-                            <b-form-input v-model="passwordLogin" id="input-2" type="password" placeholder="Digite sua senha"
-                                required></b-form-input>
+                            <b-form-input v-model="passwordLogin" id="input-2" type="password"
+                                placeholder="Digite sua senha" required></b-form-input>
                         </b-form-group>
                         <p class="esqueci" @click="showForgotPassword = true">Esqueceu sua senha?</p>
                         <div class="button">
@@ -24,11 +25,12 @@
                         <b-alert v-if="loginError" variant="danger">
                             Erro ao fazer login. Por favor verifique suas credenciais.
                         </b-alert>
-                        <div class="button">
-                            <b-button class="w-100 mt-2 text-normal" type="submit" variant="outline-primary"
-                                @click="login"><b-icon class="google" icon="google"></b-icon>Entrar com o Google</b-button>
-                        </div>
                     </b-form>
+                    <div class="button">
+                        <b-button class="w-100 mt-2 text-normal" type="submit" variant="outline-primary"><b-icon
+                                class="google" icon="google"></b-icon>Entrar com o
+                            Google</b-button>
+                    </div>
                     <div class="criar">
                         <p>Ainda não tem uma conta?</p>
                         <p class="criar-conta" @click="showCreateAccount = true">Criar Conta</p>
@@ -63,8 +65,12 @@
                     <b-form-input v-model="email" id="input-5" type="email" placeholder="Digite seu email"
                         required></b-form-input>
                 </b-form-group>
-                <b-form-group id="input-group-6" label="Senha:" label-for="input-6">
-                    <b-form-input v-model="password" id="input-6" :type="showPassword ? 'text' : 'password'"
+                <b-form-group id="input-group-5" label="Cidade:" label-for="input-6">
+                    <b-form-input v-model="cidade" id="input-6" type="text" placeholder="Informe sua cidade"
+                        required></b-form-input>
+                </b-form-group>
+                <b-form-group id="input-group-6" label="Senha:" label-for="input-7">
+                    <b-form-input v-model="password" id="input-7" :type="showPassword ? 'text' : 'password'"
                         placeholder="Digite sua senha" required></b-form-input>
                 </b-form-group>
                 <b-form-checkbox v-model="showPassword">Mostrar Senha</b-form-checkbox>
@@ -84,8 +90,9 @@ export default {
         return {
             name: '',
             email: '',
+            cidade: '',
             password: '',
-            emailLogin:'',
+            emailLogin: '',
             passwordLogin: '',
             showForgotPassword: false,
             showSuccessMessage: false,
@@ -138,12 +145,14 @@ export default {
                 const response = await this.$api.post('/register', {
                     name: this.name,
                     email: this.email,
+                    cidade: this.cidade,
                     password: this.password
                 });
                 this.responseData = response.data;
 
                 this.name = '';
                 this.email = '';
+                this.cidade = '';
                 this.password = '';
 
                 alert("Usuário Registrado com sucesso");
@@ -163,6 +172,7 @@ export default {
         resetCreateAccount() {
             this.name = '';
             this.email = '';
+            this.cidade = '';
             this.password = '';
 
             this.showPassword = false;

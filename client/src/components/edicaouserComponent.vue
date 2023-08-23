@@ -10,12 +10,12 @@
                 <b-form-input id="input-email" type="email" v-model="usuario.email" required></b-form-input>
             </b-form-group>
 
-            <b-form-group label="Senha Atual" label-for="input-senha">
-                <b-form-input id="input-senha" type="password" v-model="usuario.senha" required></b-form-input>
+            <b-form-group label="Senha Atual" label-for="input-senha-atual">
+                <b-form-input id="input-senha-atual" type="password" v-model="senhaAtual" required></b-form-input>
             </b-form-group>
-            
-            <b-form-group label="Nova Senha" label-for="input-senha">
-                <b-form-input id="input-senha" type="password" v-model="usuario.senha" required></b-form-input>
+
+            <b-form-group label="Nova Senha" label-for="input-nova-senha">
+                <b-form-input id="input-nova-senha" type="password" v-model="novaSenha" required></b-form-input>
             </b-form-group>
 
             <b-form-group>
@@ -34,28 +34,45 @@ export default {
             usuario: {
                 nome: '',
                 email: ''
-            }
+            },
+            senhaAtual: '',
+            novaSenha: ''
         };
     },
+    created() {
+        this.fetchUserData();
+    },
     methods: {
+        async fetchUserData() {
+            try {
+                const response = await this.$api.get('/profile');
+                this.usuario = response.data// Set the fetched user data to the component's data
+            } catch (error) {                                                                           
+                console.error('Error fetching user data:', error);
+            }
+        },
+
         submitForm() {
-            // Lógica para salvar as alterações do usuário
-            // Você pode acessar os valores atualizados em this.usuario
+           
         }
-    }
+    },
 }
+
 </script>
 
 <style scoped>
-.geralE{
+.geralE {
     margin: 40px;
 }
-h2{
+
+h2 {
     margin-top: 30px;
 }
-form{
+
+form {
     margin-top: 30px;
 }
+
 button {
     margin-top: 20px;
     margin-right: 10px;
