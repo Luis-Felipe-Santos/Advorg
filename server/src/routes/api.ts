@@ -10,4 +10,7 @@ router.post("/login", ApiController.login);
 
 router.get("/profile", Auth.private, ApiController.getProfile);
 
+router.put("/updateProfile", Auth.private, ApiController.updateProfile); 
+
+
 export default router;

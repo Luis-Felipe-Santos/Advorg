@@ -3,11 +3,15 @@
         <h2>Usuário - Edição Perfil</h2>
         <form @submit="submitForm">
             <b-form-group label="Nome" label-for="input-nome">
-                <b-form-input id="input-nome" v-model="usuario.nome" required></b-form-input>
+                <b-form-input id="input-nome" v-model="usuario.name" required></b-form-input>
             </b-form-group>
 
             <b-form-group label="E-mail" label-for="input-email">
                 <b-form-input id="input-email" type="email" v-model="usuario.email" required></b-form-input>
+            </b-form-group>
+
+            <b-form-group label="Cidade" label-for="input-cidade">
+                <b-form-input id="input-cidade" type="text" v-model="usuario.cidade" required></b-form-input>
             </b-form-group>
 
             <b-form-group label="Senha Atual" label-for="input-senha-atual">
@@ -32,8 +36,9 @@ export default {
     data() {
         return {
             usuario: {
-                nome: '',
-                email: ''
+                name: '',
+                email: '',
+                cidade: '',
             },
             senhaAtual: '',
             novaSenha: ''
@@ -45,15 +50,22 @@ export default {
     methods: {
         async fetchUserData() {
             try {
-                const response = await this.$api.get('/profile');
-                this.usuario = response.data// Set the fetched user data to the component's data
-            } catch (error) {                                                                           
+                const token = localStorage.getItem("authToken");// Replace with your actual JWT token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+                const response = await this.$api.get("/profile", config);
+                console.log(response.data);
+                this.usuario = response.data;
+            } catch (error) {
                 console.error('Error fetching user data:', error);
             }
         },
 
-        submitForm() {
-           
+        async submitForm() {
+
         }
     },
 }

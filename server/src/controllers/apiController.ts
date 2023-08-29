@@ -74,7 +74,7 @@ export const login = async (req: Request, res: Response) => {
 export const getProfile = async (req: Request, res: Response) => {
   try {
     // Recuperar os dados do usuário logado da requisição
-    const user = req.user;
+    const user = res.locals.user;
     // Retornar os dados do usuário como resposta JSON
     res.json(user);
   } catch (error) {
@@ -82,3 +82,38 @@ export const getProfile = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Erro ao obter dados do usuário" });
   }
 };
+
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user!.id; // Obtém o ID do usuário logado
+
+    const { name, email, cidade, newPassword } = req.body; // Novos dados do perfil
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+
+    if (newPassword) {
+      const newPasswordHash = await hash(newPassword, 10);
+      user.password = newPasswordHash;
+    }
+
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.cidade = cidade || user.cidade;
+    await user.save();
+
+    res.json({ message: "Perfil atualizado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao atualizar perfil do usuário:", error);
+    res.status(500).json({ error: "Erro ao atualizar perfil do usuário" });
+  }
+};
+
+
+
+
+
+
