@@ -19,7 +19,7 @@ export default {
     },
   },
   created() {
-    this.fetchUserData();
+    this.$store.dispatch("fetchUserData");
   },
   methods: {
     inicio() {
@@ -31,26 +31,7 @@ export default {
     sair() {
       this.$router.push("/");
     },
-    async fetchUserData() {
-      try {
-        const token = localStorage.getItem("authToken");
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        const response = await this.$api.get("/profile", config);
-        const userData = response.data;
 
-        // Commit a Vuex mutation to update the user data in the store
-        this.$store.commit("updateUserData", {
-          name: userData.name,
-          cidade: userData.cidade,
-        });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    },
   },
 };
 

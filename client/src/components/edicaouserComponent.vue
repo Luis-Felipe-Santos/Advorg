@@ -64,7 +64,7 @@ export default {
                 const response = await this.$api.get("/profile", config);
                 console.log(response.data);
                 this.usuario = response.data;
-                this.usuarioOriginal = { ...response.data };
+                this.usuarioOriginal = JSON.parse(JSON.stringify(response.data));
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -97,6 +97,7 @@ export default {
 
                 this.showSuccessModal = true;
                 this.successTimeout = setTimeout(this.closeSuccessModal, 2000);
+                this.usuarioOriginal = JSON.parse(JSON.stringify(this.usuario));
 
             } catch (error) {
                 console.error("Erro ao atualizar perfil:", error);
@@ -104,7 +105,7 @@ export default {
         },
 
         cancel() {
-            this.usuario = { ...this.usuarioOriginal };
+            this.usuario = JSON.parse(JSON.stringify(this.usuarioOriginal));
             this.novaSenha = '';
         },
 
