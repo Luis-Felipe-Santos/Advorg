@@ -116,10 +116,27 @@ export default {
                     console.log('Successful login');
                     localStorage.setItem('authToken', response.data.token);
                     this.$router.push('/home');
-                } else {
-                    console.log('Failed login');
-                    this.loginError = true;
-                }
+                } 
+            } catch (error) {
+                console.error('Error during login:', error);
+            }
+
+        },
+        async loginUserPreposto() {
+            console.log('Login method started');
+            try {
+                const response = await this.$api.post('/login/preposto', {
+                    email: this.emailLogin,
+                    password: this.passwordLogin,
+                });
+
+                console.log('Response:', response.data);
+
+                if (response.data.status) {
+                    console.log('Successful login');
+                    localStorage.setItem('authToken', response.data.token);
+                    this.$router.push('/home');
+                } 
             } catch (error) {
                 console.error('Error during login:', error);
             }

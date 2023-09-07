@@ -15,7 +15,7 @@ export default {
   name: "cabecalhoComponent",
   computed: {
     usuario() {
-      return this.$store.state.usuario; // Use the Vuex store's usuario state
+      return this.$store.state.usuario; 
     },
   },
   created() {

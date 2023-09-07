@@ -1,7 +1,7 @@
 <template>
     <div class="geralP">
         <h2>Cadastrar novo processo</h2>
-        <b-form @submit="submitForm">
+        <b-form @submit.prevent="registerProcesso">
             <b-form-group label="Número do Processo" label-for="num_processo">
                 <b-form-input id="num_processo" v-model="processo.numeroProcesso" required></b-form-input>
             </b-form-group>
@@ -37,8 +37,6 @@ export default {
                 numeroProcesso:'',
                 nomeAutor: '',
                 nomeReu: '',
-                email: '',
-                senha: '',
                 situacao: null,
             },
             situacoes: [],
@@ -48,13 +46,42 @@ export default {
         this.carregarSituacoes(); 
     },
     methods: {
+        async registerProcesso() {
+            try {
+
+                const token = localStorage.getItem("authToken");
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+
+                await this.$api.post('/cadastro/processo', {
+                    nProcesso: this.processo.numeroProcesso,
+                    nameAutor: this.processo.nomeAutor,
+                    nameReu: this.processo.nomeReu,
+                    situacao: this.processo.situacao,
+                }, config);
+
+                this.processo.numeroProcesso = '';
+                this.processo.nomeAutor = '';
+                this.processo.nomeReu = '';
+                this.processo.situacao = null;
+
+                alert('Processo Cadastrado com sucesso');
+            } catch (error) {
+                console.error('Erro ao cadastrar processo:', error);
+                alert('O processo informado já existe');
+            }
+
+        },
         submitForm() {
             // Lógica para enviar o formulário de cadastro
             // Você pode acessar os valores do formulário em this.usuario
         },
         carregarSituacoes() {
             // Exemplo de carregamento manual:
-            this.situacoes = ['Selecione uma', 'Ativado','Baixado'];
+            this.situacoes = ['Selecione uma', 'Ativo','Baixado'];
         },
     }
 }

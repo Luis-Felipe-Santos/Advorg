@@ -1,7 +1,7 @@
 <template>
     <div class="geralP">
         <h2>Cadastrar novo usuário</h2>
-        <b-form @submit="submitForm">
+        <b-form @submit.prevent="createAccount">
             <b-form-group label="Nome" label-for="input-nome">
                 <b-form-input id="input-nome" v-model="usuario.nome" required></b-form-input>
             </b-form-group>
@@ -10,9 +10,6 @@
                 <b-form-input id="input-email" type="email" v-model="usuario.email" required></b-form-input>
             </b-form-group>
 
-            <b-form-group label="Cep" label-for="input-cep">
-                <b-form-input id="input-cep" type="text" v-model="usuario.cep" required></b-form-input>
-            </b-form-group>
             <b-form-group label="Cidade" label-for="input-cidade">
                 <b-form-input id="input-cidade" type="text" v-model="usuario.cidade" required></b-form-input>
             </b-form-group>
@@ -36,40 +33,60 @@
 </template>
   
 <script>
-
-
 export default {
     data() {
         return {
             usuario: {
                 nome: '',
                 email: '',
+                cidade: '',
                 senha: '',
                 permissao: null,
             },
-            permissoes: [],
+            permissoes: ['Selecione uma', 'Master', 'Operador', 'Visualizador'],
         };
     },
-    created() {
-        this.carregarPermissoes(); // Chama o método para carregar as permissões
-    },
     methods: {
-        submitForm() {
-            // Lógica para enviar o formulário de cadastro
-            // Você pode acessar os valores do formulário em this.usuario
-        },
-        carregarPermissoes() {
-            // Exemplo de carregamento manual:
-            this.permissoes = ['Selecione uma', 'Master', 'Operador', 'Visualizador'];
-        },
-    }
-}
-</script>
+        async createAccount() {
+            try {
 
+                const token = localStorage.getItem("authToken");
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+
+                await this.$api.post('/cadastro/preposto', {
+                    name: this.usuario.nome,
+                    email: this.usuario.email,
+                    cidade: this.usuario.cidade,
+                    password: this.usuario.senha,
+                    permissao: this.usuario.permissao,
+                }, config);
+
+                this.usuario.nome = '';
+                this.usuario.email = '';
+                this.usuario.cidade = '';
+                this.usuario.senha = '';
+                this.usuario.permissao = null;
+
+                alert('Usuário Registrado com sucesso');
+            } catch (error) {
+                console.error('Erro ao criar a conta:', error);
+                alert('O email informado já possui cadastro');
+            }
+
+        },
+    },
+};
+</script>
+  
 <style scoped>
-.geralP{
+.geralP {
     margin: 40px;
 }
+
 form {
     margin-top: 50px;
 }
@@ -83,3 +100,4 @@ h2 {
     margin-top: 20px;
 }
 </style>
+  
