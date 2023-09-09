@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { Processo } from "../models/Processo";
-
+import { format } from "date-fns";
 
 dotenv.config();
 
@@ -17,7 +17,6 @@ export const registerProcesso = async (req: Request, res: Response) => {
   try {
     const createdBy = res.locals.user.name;
     const createdAt = new Date();
-
 
     const novoProcesso = await Processo.create({
       nProcesso,
@@ -37,5 +36,20 @@ export const registerProcesso = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ error: "Erro interno ao cadastrar processo." });
+  }
+};
+export const getProcessos = async (req: Request, res: Response) => {
+  try {
+    // Recuperar os dados de processos do banco de dados
+    const processos = await Processo.findAll();
+    const processosFormatados = processos.map((processo) => ({
+      ...processo.toJSON(),
+      createdAt: format(new Date(processo.createdAt), "dd/MM/yyyy"),
+    }));
+    // Retornar os dados de processos como resposta JSON
+    res.json(processosFormatados);
+  } catch (error) {
+    console.error("Erro ao obter dados dos processos:", error);
+    res.status(500).json({ error: "Erro ao obter dados dos processos" });
   }
 };

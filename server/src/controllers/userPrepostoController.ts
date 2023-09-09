@@ -3,6 +3,7 @@ import { hash, compare } from "bcrypt";
 import dotenv from "dotenv";
 import { UserPreposto } from "../models/UserPreposto";
 import { generateToken } from "../config/passport";
+import { format } from "date-fns";
 
 dotenv.config();
 
@@ -10,11 +11,10 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
   const { name, email, cidade, password, permissao } = req.body;
   const loggedInUserId = res.locals.user.id; // Obtém o ID do usuário logado
 
-  console.log('Dados recebidos do frontend:', req.body);
+  console.log("Dados recebidos do frontend:", req.body);
 
   if (!name || !email || !cidade || !password || !permissao) {
-
-    console.log('Campos ausentes:', req.body);
+    console.log("Campos ausentes:", req.body);
 
     return res.status(400).json({
       message:
@@ -23,12 +23,10 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
   }
 
   try {
-    
     // Verifica se o usuário com o email já existe na tabela UserPreposto
     const hasUser = await UserPreposto.findOne({ where: { email } });
 
-    console.log('Resultado da verificação de email:', hasUser);
-
+    console.log("Resultado da verificação de email:", hasUser);
 
     if (!hasUser) {
       const createdAt = new Date();
@@ -40,12 +38,11 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
         cidade,
         password: passwordHash,
         permissao,
-        users_id: loggedInUserId, 
+        users_id: loggedInUserId,
         createdAt,
       });
 
-      console.log('Novo usuário preposto criado:', newUserPreposto);
-      
+      console.log("Novo usuário preposto criado:", newUserPreposto);
 
       const token = generateToken({ id: newUserPreposto.iduserPreposto });
 
@@ -64,29 +61,25 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
       .json({ error: "Erro interno ao cadastrar usuário preposto." });
   }
 };
+export const getUserPrepostoData = async (req: Request, res: Response) => {
+  try {
+    // Recupere todos os usuários prepostos da tabela
+    const usuariosprepostos = await UserPreposto.findAll();
 
-export const loginUserPreposto = async (req: Request, res: Response) => {
-  if (req.body.email && req.body.password) {
-    let email: string = req.body.email;
-    let password: string = req.body.password;
-
-    let user = await UserPreposto.findOne({
-      where: { email },
-    });
-
-    if (user) {
-      const verifyPassword = await compare(password, user.password);
-
-      if (verifyPassword) {
-        const token = generateToken({
-          id: user.iduserPreposto,
-          name: user.name,
-          cidade: user.cidade,
-        });
-        return res.json({ status: true, token });
-      }
+    // Se não houver usuários prepostos, retorne uma resposta vazia ou uma mensagem adequada
+    if (!usuariosprepostos || usuariosprepostos.length === 0) {
+      return res.status(404).json({ error: "Nenhum usuário preposto encontrado." });
     }
-  }
+    const usersPrepostoFormatado = usuariosprepostos.map((usuariospreposto) => ({
+      ...usuariospreposto.toJSON(),
+      createdAt: format(new Date(usuariospreposto.createdAt), "dd/MM/yyyy"),
+    }));
 
-  res.json({ status: false });
+    return res.status(200).json(usersPrepostoFormatado);
+  } catch (error) {
+    console.error("Erro ao obter dados dos usuários prepostos:", error);
+    return res
+      .status(500)
+      .json({ error: "Erro interno ao obter dados dos usuários prepostos." });
+  }
 };

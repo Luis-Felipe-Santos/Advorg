@@ -24,8 +24,8 @@
           <b-col cols="3">
             <b-form-group label="Data">
               <b-form-datepicker v-model="selectedDate"
-                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }" class="form-control"
-               ></b-form-datepicker>
+                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }"
+                class="form-control"></b-form-datepicker>
             </b-form-group>
           </b-col>
           <b-col cols="3" class="mb-5">
@@ -41,6 +41,7 @@
     <b-container class="custom-container">
       <b-table striped hover :items="items" :fields="fields">
         <template v-slot:cell(eventos)="">
+
           <b-icon @click="visualizar" class="icon" icon="eye"></b-icon>
           <b-icon @click="editar" class="icon" icon="pencil-square"></b-icon>
           <b-icon @click="excluir" class="icon" icon="trash-fill"></b-icon>
@@ -51,6 +52,7 @@
 </template>
 
 <script>
+import { parseISO, format } from "date-fns";
 export default {
   name: "processosVue",
   data() {
@@ -59,29 +61,25 @@ export default {
       input2: "",
       input3: "",
       input4: "",
-      selectedDate: null, 
+      selectedDate: null,
 
       fields: [
         {
-          key: 'id',
+          key: 'nProcesso',
           sortable: false
         },
         {
-          key: 'NumeroProcesso',
-          sortable: false
-        },
-        {
-          key: 'NomeAutor',
+          key: 'nameAutor',
           label: 'Nome Autor',
           sortable: false
         },
         {
-          key: 'NomeReu',
+          key: 'nameReu',
           label: 'Nome Reu',
           sortable: false
         },
         {
-          key: 'data',
+          key: 'createdAt',
           label: 'Data',
           sortable: false
         },
@@ -91,7 +89,7 @@ export default {
           sortable: false
         },
         {
-          key: 'NomeUser',
+          key: 'createdBy',
           label: 'Cadastrado por',
           sortable: false
         },
@@ -102,52 +100,61 @@ export default {
         },
 
       ],
-      items: [
-        { id: 1, NumeroProcesso: 5000123214521412, NomeAutor: 'Dickerson', NomeReu: 'Macdonald', data: '11/07/2023', NomeUser: 'Luis', situacao: 'Ativo' },
-        { id: 2, NumeroProcesso: 5000123214521413, NomeAutor: 'Luis', NomeReu: 'Irineu', data: '12/10/2023', NomeUser: 'Luis', situacao: 'Baixado' },
-        { id: 3, NumeroProcesso: 5000123214521414, NomeAutor: 'Luis', NomeReu: 'Irineu', data: '12/10/2023', NomeUser: 'Luis', situacao: 'Baixado' },
-
-      ],
-      originalItems: []
+      items: [],
+      originalItems: [],
     }
   },
   created() {
-    // Copy the original items to the separate variable when the component is created
-    this.originalItems = [...this.items];
+    // Buscar dados iniciais dos processos do back-end quando o componente é criado
+    this.fetchInitialData();
   },
   methods: {
-    
-    submitForm() {
-      // Filter the items array based on the input values
-      const filteredItems = this.originalItems.filter(item => {
-        // Perform case-insensitive matching for process number, author name, and defendant name
-        const searchInput1 = this.input1.toLowerCase();
-        const searchInput2 = this.input2.toLowerCase();
-        const searchInput3 = this.input3.toLowerCase();
-        const searchInput4 = this.input4.toLowerCase();
 
-        return (
-          item.NumeroProcesso.toString().includes(searchInput1) &&
-          item.NomeAutor.toLowerCase().includes(searchInput2) &&
-          item.NomeReu.toLowerCase().includes(searchInput3) &&
-          item.situacao.toLowerCase().includes(searchInput4)
-        );
-      });
+    async fetchInitialData() {
+      try {
+        const response = await this.$api.get('/processos'); // Certifique-se de usar a rota correta
+        this.items = response.data;
+        this.originalItems = [...response.data]; // Mantenha uma cópia dos dados originais
+      } catch (error) {
+        console.error('Erro ao buscar dados iniciais dos processos:', error);
+      }
+    },
 
-      this.items = filteredItems;
+    async submitForm() {
+      try {
+        // Crie um objeto com os parâmetros de filtro
+        const filterParams = {
+          input1: this.input1,
+          input2: this.input2.toLowerCase(),
+          input3: this.input3.toLowerCase(),
+          input4: this.input4.toLowerCase(),
+          selectedDate: this.selectedDate ? format(parseISO(this.selectedDate), "dd/MM/yyyy") : "",
+
+        };
+
+        const filteredItems = this.originalItems.filter(item => {
+          return (
+            item.nProcesso.toString().includes(filterParams.input1) &&
+            item.nameAutor.toLowerCase().includes(filterParams.input2) &&
+            item.nameReu.toLowerCase().includes(filterParams.input3) &&
+            item.situacao.toLowerCase().includes(filterParams.input4) &&
+            (filterParams.selectedDate === "" || item.createdAt === filterParams.selectedDate)
+          );
+        });
+
+        this.items = filteredItems;
+      } catch (error) {
+        console.error('Erro ao buscar dados filtrados dos processos:', error);
+      }
     },
 
     resetForm() {
-      // Clear the input values
       this.input1 = '';
       this.input2 = '';
       this.input3 = '';
       this.input4 = '';
       this.selectedDate = null;
-      // Restore the original items
-      this.items = [
-        ...this.originalItems
-      ];
+      this.items = [...this.originalItems];
     },
     visualizar() {
       // Lógica do clique aqui
