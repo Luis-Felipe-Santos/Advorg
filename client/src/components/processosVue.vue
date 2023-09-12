@@ -81,7 +81,7 @@ export default {
         {
           key: 'createdAt',
           label: 'Data',
-          sortable: false
+          sortable: false,
         },
         {
           key: 'situacao',
@@ -96,7 +96,8 @@ export default {
         {
           key: 'eventos',
           label: 'Eventos',
-          sortable: false
+          sortable: false,
+          
         },
 
       ],
@@ -105,16 +106,15 @@ export default {
     }
   },
   created() {
-    // Buscar dados iniciais dos processos do back-end quando o componente é criado
     this.fetchInitialData();
   },
   methods: {
-
     async fetchInitialData() {
       try {
-        const response = await this.$api.get('/processos'); // Certifique-se de usar a rota correta
+        const response = await this.$api.get('/processos'); 
         this.items = response.data;
-        this.originalItems = [...response.data]; // Mantenha uma cópia dos dados originais
+        
+        this.originalItems = [...response.data]; 
       } catch (error) {
         console.error('Erro ao buscar dados iniciais dos processos:', error);
       }

@@ -70,12 +70,8 @@ export const getUserPrepostoData = async (req: Request, res: Response) => {
     if (!usuariosprepostos || usuariosprepostos.length === 0) {
       return res.status(404).json({ error: "Nenhum usuário preposto encontrado." });
     }
-    const usersPrepostoFormatado = usuariosprepostos.map((usuariospreposto) => ({
-      ...usuariospreposto.toJSON(),
-      createdAt: format(new Date(usuariospreposto.createdAt), "dd/MM/yyyy"),
-    }));
 
-    return res.status(200).json(usersPrepostoFormatado);
+    return res.status(200).json(usuariosprepostos); //
   } catch (error) {
     console.error("Erro ao obter dados dos usuários prepostos:", error);
     return res

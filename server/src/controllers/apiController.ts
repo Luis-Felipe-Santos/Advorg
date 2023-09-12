@@ -23,8 +23,6 @@ export const register = async (req: Request, res: Response) => {
       const passwordHash = await hash(password, 10);
       const newUser = await User.create({
         name,
-        email,
-        cidade,
         password: passwordHash,
       });
       const token = generateToken({ id: newUser.id });

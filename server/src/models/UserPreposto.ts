@@ -8,7 +8,7 @@ export interface UserInstancePreposto extends Model {
     email: string;
     password: string;
     permissao: string;
-    createdAt: Date,
+    createdAt: Date;
 }
 
 export const UserPreposto = sequelize.define<UserInstancePreposto>('UserPreposto', {

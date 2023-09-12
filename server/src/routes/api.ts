@@ -10,7 +10,10 @@ const router = Router();
 router.post("/register", ApiController.register);
 router.post("/login", ApiController.login);
 
-router.post("/cadastro/preposto",Auth.private,UserPreposto.registerUserPreposto
+router.post(
+  "/cadastro/preposto",
+  Auth.private,
+  UserPreposto.registerUserPreposto
 );
 router.get("/usuarios", Auth.private, UserPreposto.getUserPrepostoData);
 

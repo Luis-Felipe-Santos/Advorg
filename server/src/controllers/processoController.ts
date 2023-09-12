@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { Processo } from "../models/Processo";
-import { format } from "date-fns";
+import {format, parseISO} from "date-fns";
+
 
 dotenv.config();
 
@@ -42,10 +43,13 @@ export const getProcessos = async (req: Request, res: Response) => {
   try {
     // Recuperar os dados de processos do banco de dados
     const processos = await Processo.findAll();
+  
     const processosFormatados = processos.map((processo) => ({
       ...processo.toJSON(),
-      createdAt: format(new Date(processo.createdAt), "dd/MM/yyyy"),
+      createdAt: format(parseISO(processo.createdAt.toString()), "dd/MM/yyyy"),
     }));
+   
+    console.log("Processos depois de formatados", processosFormatados); 
     // Retornar os dados de processos como resposta JSON
     res.json(processosFormatados);
   } catch (error) {

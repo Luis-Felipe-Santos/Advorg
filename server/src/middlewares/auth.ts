@@ -16,19 +16,14 @@ export const Auth = {
       const [authType, token] = req.headers.authorization.split(" ");
       if (authType === "Bearer") {
         try {
-          console.log("Token do portador encontrado");
-
           const decodedToken = JWT.verify(
             token,
             process.env.JWT_SECRET as string
           ) as { id: number };
 
-          console.log("Token decodificado:", decodedToken);
-
           const user = await User.findOne({ where: { id: decodedToken.id } });
 
           if (user) {
-            console.log("Usuário encontrado:", user);
             res.locals.user = user;
             success = true;
           }
@@ -38,12 +33,9 @@ export const Auth = {
         }
       }
     }
-
     if (success) {
-      console.log("Autenticação bem-sucedida");
       next();
     } else {
-      console.log("Falha na autenticação");
       res.status(403).json({ error: "Não autorizado" });
     }
   },
