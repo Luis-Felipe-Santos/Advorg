@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-nav>
-      <b-nav-item><router-link class="router-link-no-underline" to="/home">Logo</router-link></b-nav-item>
+      <b-nav-item><router-link class="router-link-no-underline" to="/home"><img class="logo-img" src="../assets/logo1.png" alt="logo"></router-link></b-nav-item>
       <b-nav-item @click.prevent="perfil"><b-icon icon="pencil"></b-icon> {{ usuario.name }} Cidade: {{ usuario.cidade }}</b-nav-item>
       <b-nav-item><b-icon icon="book"></b-icon> Manual de utilização</b-nav-item>
       <b-nav-item @click.prevent="sair"><b-icon icon="arrow-bar-right"></b-icon> Sair</b-nav-item>
@@ -29,6 +29,7 @@ export default {
       this.$router.push("/perfil");
     },
     sair() {
+      this.$store.dispatch("logout");
       this.$router.push("/");
     },
 
@@ -48,12 +49,15 @@ export default {
   background-color: #2b59bd;
   height: 80px;
 }
-
+.logo-img {
+  width: 100px;
+  height: 100%;
+  
+}
 .nav-item {
   display: flex;
-  align-items: end;
-  justify-content: space-between;
-  padding-bottom: 5px;
+  align-items: center;
+  justify-content: space-between
 }
 
 .nav-link {

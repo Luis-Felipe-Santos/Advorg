@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { Processo } from "../models/Processo";
-import {format, parseISO} from "date-fns";
-
+import { format, parseISO } from "date-fns";
 
 dotenv.config();
 
@@ -41,19 +40,54 @@ export const registerProcesso = async (req: Request, res: Response) => {
 };
 export const getProcessos = async (req: Request, res: Response) => {
   try {
-    // Recuperar os dados de processos do banco de dados
     const processos = await Processo.findAll();
-  
-    const processosFormatados = processos.map((processo) => ({
-      ...processo.toJSON(),
-      createdAt: format(parseISO(processo.createdAt.toString()), "dd/MM/yyyy"),
-    }));
-   
-    console.log("Processos depois de formatados", processosFormatados); 
-    // Retornar os dados de processos como resposta JSON
-    res.json(processosFormatados);
+    console.log(processos);
+    let activeCount = 0;
+    let archivedCount = 0;
+
+    const processosFormatados = processos.map((processo) => {
+      if (processo.situacao === "Ativo") {
+        activeCount++;
+      } else if (processo.situacao === "Baixado") {
+        archivedCount++;
+      }
+
+      return {
+        ...processo.toJSON(),
+        createdAt: format(
+          parseISO(processo.createdAt.toString()),
+          "dd/MM/yyyy"
+        ),
+      };
+    });
+
+    const processCounts = {
+      active: activeCount,
+      archived: archivedCount,
+    };
+
+    res.json({ processos: processosFormatados, counts: processCounts });
   } catch (error) {
     console.error("Erro ao obter dados dos processos:", error);
     res.status(500).json({ error: "Erro ao obter dados dos processos" });
+  }
+};
+
+export const deleteProcesso = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params; // Suponha que o parâmetro seja passado na URL
+
+    const processo = await Processo.findByPk(id);
+
+    if (!processo) {
+      return res.status(404).json({ error: "Processo não encontrado" });
+    }
+
+    await processo.destroy(); // Isso irá excluir o registro do banco de dados
+
+    return res.status(200).json({ message: "Processo excluído com sucesso" });
+  } catch (error) {
+    console.error("Erro ao excluir processo:", error);
+    return res.status(500).json({ error: "Erro interno ao excluir processo" });
   }
 };

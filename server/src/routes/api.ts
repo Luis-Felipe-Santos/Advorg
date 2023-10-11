@@ -15,13 +15,16 @@ router.post(
   Auth.private,
   UserPreposto.registerUserPreposto
 );
+
 router.get("/usuarios", Auth.private, UserPreposto.getUserPrepostoData);
 
 router.post("/cadastro/processo", Auth.private, Processo.registerProcesso);
 router.get("/processos", Processo.getProcessos);
+router.delete("/processos/:id", Processo.deleteProcesso);
 
 router.get("/profile", Auth.private, ApiController.getProfile);
 
 router.put("/updateProfile", Auth.private, ApiController.updateProfile);
+
 
 export default router;

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { hash, compare } from "bcrypt";
+import { hash } from "bcrypt";
 import dotenv from "dotenv";
 import { UserPreposto } from "../models/UserPreposto";
 import { generateToken } from "../config/passport";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 dotenv.config();
 
@@ -31,6 +31,7 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
     if (!hasUser) {
       const createdAt = new Date();
       const passwordHash = await hash(password, 10);
+      console.log("Senha hashada:", passwordHash);
       console.log("loggedInUserId:", loggedInUserId);
       const newUserPreposto = await UserPreposto.create({
         name,
@@ -45,6 +46,8 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
       console.log("Novo usuário preposto criado:", newUserPreposto);
 
       const token = generateToken({ id: newUserPreposto.iduserPreposto });
+
+      console.log("Token gerado:", token);
 
       return res.status(201).json({
         id: newUserPreposto.iduserPreposto,
@@ -61,17 +64,22 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
       .json({ error: "Erro interno ao cadastrar usuário preposto." });
   }
 };
+
 export const getUserPrepostoData = async (req: Request, res: Response) => {
   try {
     // Recupere todos os usuários prepostos da tabela
     const usuariosprepostos = await UserPreposto.findAll();
-
+    const usuariosprepostosFormatados = usuariosprepostos.map((usuario) => ({
+      ...usuario.toJSON(),
+      createdAt: format(parseISO(usuario.createdAt.toString()), "dd/MM/yyyy"),
+    }));
     // Se não houver usuários prepostos, retorne uma resposta vazia ou uma mensagem adequada
     if (!usuariosprepostos || usuariosprepostos.length === 0) {
-      return res.status(404).json({ error: "Nenhum usuário preposto encontrado." });
+      return res
+        .status(404)
+        .json({ error: "Nenhum usuário preposto encontrado." });
     }
-
-    return res.status(200).json(usuariosprepostos); //
+    return res.status(200).json(usuariosprepostosFormatados);
   } catch (error) {
     console.error("Erro ao obter dados dos usuários prepostos:", error);
     return res

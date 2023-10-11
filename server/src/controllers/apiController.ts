@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { hash, compare } from "bcrypt";
 import dotenv from "dotenv";
 import { User, UserInstance } from "../models/User";
+import { UserPreposto, UserInstancePreposto } from "../models/UserPreposto";
 import { generateToken } from "../config/passport";
-
 
 dotenv.config();
 
@@ -23,6 +23,8 @@ export const register = async (req: Request, res: Response) => {
       const passwordHash = await hash(password, 10);
       const newUser = await User.create({
         name,
+        email,
+        cidade,
         password: passwordHash,
       });
       const token = generateToken({ id: newUser.id });
@@ -45,25 +47,73 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   if (req.body.email && req.body.password) {
-    let email: string = req.body.email;
-    let password: string = req.body.password;
+    const email: string = req.body.email;
+    const password: string = req.body.password;
 
-    let user = await User.findOne({
+    console.log("Tentativa de login com email:", email);
+
+    // Primeiro, tente encontrar o usuário na tabela User
+    const user: UserInstance | null = await User.findOne({
       where: { email },
     });
 
-    if (user) {
-      const verifyPassword = await compare(password, user.password);
+    console.log("Resultado da busca na tabela User:", user);
 
-      if (verifyPassword) {
+    if (!user) {
+      console.log("Usuário não encontrado na tabela User");
+
+      // Se não encontrar o usuário na tabela User, tente na tabela UserPreposto
+      const preposto: UserInstancePreposto | null = await UserPreposto.findOne({
+        where: { email },
+      });
+
+      console.log("Resultado da busca na tabela UserPreposto:", preposto);
+
+      if (preposto) {
+        const isPasswordValid = await compare(password, preposto.password);
+
+        console.log("Senha fornecida durante o login:", password);
+        console.log("Senha hashada no banco de dados:", preposto.password);
+        console.log("Verificação de senha:", isPasswordValid);
+
+        if (isPasswordValid) {
+          const token = generateToken({
+            id: preposto.iduserPreposto,
+            name: preposto.name,
+            cidade: preposto.cidade,
+          });
+
+          console.log("Token gerado com sucesso:", token);
+
+          return res.json({ status: true, token });
+        } else {
+          console.log("Senha incorreta");
+        }
+      } else {
+        console.log("Usuário não encontrado na tabela UserPreposto");
+      }
+    } else {
+      const isPasswordValid = await compare(password, user.password);
+      console.log("Senha fornecida durante o login:", password);
+      console.log("Senha hashada no banco de dados:", user.password);
+      console.log("Verificação de senha:", isPasswordValid);
+
+      if (isPasswordValid) {
         const token = generateToken({
           id: user.id,
           name: user.name,
           cidade: user.cidade,
         });
+
+        console.log("Token gerado com sucesso:", token);
+
         return res.json({ status: true, token });
+      } else {
+        console.log("Senha incorreta");
       }
     }
+  } else {
+    console.log("Dados de login incompletos");
   }
 
   res.json({ status: false });
@@ -109,9 +159,3 @@ export const updateProfile = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Erro ao atualizar perfil do usuário" });
   }
 };
-
-
-
-
-
-

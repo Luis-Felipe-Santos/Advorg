@@ -9,7 +9,7 @@ export default new Vuex.Store({
       name: '',
       cidade: '',
     },
-    erro: null, // Adicionando um estado para erros
+    erro: null,
   },
   mutations: {
     SET_USER_DATA(state, data) {
@@ -18,6 +18,10 @@ export default new Vuex.Store({
     },
     SET_ERROR(state, error) {
       state.erro = error;
+    },
+    LOGOUT(state) {
+      state.usuario.name = '';
+      state.usuario.cidade = '';
     },
   },
   actions: {
@@ -36,11 +40,17 @@ export default new Vuex.Store({
           name: userData.name,
           cidade: userData.cidade,
         });
-        commit("SET_ERROR", null); // Limpar qualquer erro anterior
+        commit("SET_ERROR", null);
       } catch (error) {
         console.error("Erro ao buscar dados do usuário:", error);
-        commit("SET_ERROR", error); // Armazenar o erro no estado
+        commit("SET_ERROR", error);
       }
+    },
+    logout({ commit }) {
+      // Remova o token de autenticação do localStorage
+      localStorage.removeItem("authToken");
+      // Chame a mutação para deslogar o usuário
+      commit("LOGOUT");
     },
   },
   getters: {

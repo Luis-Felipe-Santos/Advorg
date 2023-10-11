@@ -6,7 +6,7 @@
             </b-card>
         </div>
         <div class="table">
-            <b-table sticky-header :items="items" head-variant="light" outlined></b-table>
+            <b-table sticky-header :items="items" head-variant="light" outlined :fields="fields"></b-table>
         </div>
     </div>
 </template>
@@ -16,20 +16,32 @@ export default {
     name: "homeprocessosComponent",
     data() {
         return {
-            items: [
-                { id: 40, numero_processo: '500054613013517', partes: 'Macdonald', usuario: "Luis" },
-                { id: 21, numero_processo: '500054613013517', partes: 'Shaw', usuario: "Luis" },
-                { id: 89, numero_processo: '500054613013517', partes: 'Wilson', usuario: "Luis" },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney', usuario: "Luis" },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney', usuario: "Luis" },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney', usuario: "Luis" },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney', usuario: "Luis" },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney', usuario: "Luis" },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney' },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney' },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney' },
-                { id: 38, numero_processo: '500054613013517', partes: 'Carney' }
-            ]
+            items: [],
+            fields: [
+                { key: "nProcesso", label: "N° do Processo" },
+                { key: "partes", label: "Partes" },
+                { key: "situacao", label: "Situação" },
+                { key: "createdAt", label: "Data de cadastro" },
+                { key: "createdBy", label: "Cadastrado por" },
+            ],
+        }
+    },
+    created() {
+        this.getdataProcessos();
+    },
+    methods: {
+        async getdataProcessos() {
+            try {
+                const response = await this.$api.get('/processos');
+                this.items = response.data.processos.map((processo) => ({
+                    ...processo,
+                    partes: `${processo.nameAutor} x ${processo.nameReu}`,
+                }));
+                this.originalItems = [...response.data.processos];
+            } catch (error) {
+                console.error('Erro ao buscar dados iniciais dos processos:', error);
+            }
+
         }
     }
 }
@@ -54,7 +66,8 @@ export default {
     justify-content: center;
     align-items: center;
 }
-.table{
+
+.table {
     margin-top: 30px;
 }
 </style>

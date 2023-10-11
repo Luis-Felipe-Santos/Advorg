@@ -85,10 +85,6 @@ export default {
         console.error('Error while fetching user data:', error);
       }
     },
-    formatarData(data) {
-      const [ano, mes, dia] = data.split("-");
-      return `${dia}/${mes}/${ano}`;
-    },
     visualizar(item) {
       console.log("Visualizar:", item);
     },

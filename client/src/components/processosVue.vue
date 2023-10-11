@@ -40,11 +40,11 @@
     </b-container>
     <b-container class="custom-container">
       <b-table striped hover :items="items" :fields="fields">
-        <template v-slot:cell(eventos)="">
+        <template v-slot:cell(eventos)="props">
 
-          <b-icon @click="visualizar" class="icon" icon="eye"></b-icon>
-          <b-icon @click="editar" class="icon" icon="pencil-square"></b-icon>
-          <b-icon @click="excluir" class="icon" icon="trash-fill"></b-icon>
+          <b-icon @click="visualizar(props.item)" class="icon" icon="eye"></b-icon>
+          <b-icon @click="editar(props.item)" class="icon" icon="pencil-square"></b-icon>
+          <b-icon @click="excluir(props.item)" class="icon" icon="trash-fill"></b-icon>
         </template>
       </b-table>
     </b-container>
@@ -62,6 +62,7 @@ export default {
       input3: "",
       input4: "",
       selectedDate: null,
+      processoParaExcluir: null,
 
       fields: [
         {
@@ -97,7 +98,7 @@ export default {
           key: 'eventos',
           label: 'Eventos',
           sortable: false,
-          
+
         },
 
       ],
@@ -111,10 +112,10 @@ export default {
   methods: {
     async fetchInitialData() {
       try {
-        const response = await this.$api.get('/processos'); 
-        this.items = response.data;
-        
-        this.originalItems = [...response.data]; 
+        const response = await this.$api.get('/processos');
+        this.items = response.data.processos;
+
+        this.originalItems = [...response.data.processos];
       } catch (error) {
         console.error('Erro ao buscar dados iniciais dos processos:', error);
       }
@@ -164,10 +165,46 @@ export default {
       // Lógica do clique aqui
       console.log("Editar!");
     },
-    excluir() {
-      // Lógica do clique aqui
-      console.log("Excluir!");
+    async excluir(processo) {
+      if (processo && processo.idProcesso) {
+        this.processoParaExcluir = processo.idProcesso;
+        this.confirmarExclusao();
+      } else {
+        console.error("ID do processo inválido.");
+      }
     },
+    confirmarExclusao() {
+      // Verifique se há um processo para excluir
+      if (this.processoParaExcluir) {
+        if (confirm("Tem certeza de que deseja excluir este processo?")) {
+          this.excluirProcesso(this.processoParaExcluir);
+        }
+      }
+    },
+    async excluirProcesso(idProcesso) {
+      try {
+        if (!idProcesso || !this.items) {
+          console.error("ID de processo ou lista de processos indefinidos");
+          return;
+        }
+
+        const idProcessoNumber = Number(idProcesso);
+
+        if (isNaN(idProcessoNumber)) {
+          console.error("ID de processo não é um número válido.");
+          return;
+        }
+
+        const response = await this.$api.delete(`/processos/${idProcessoNumber}`);
+
+        if (response.status === 200) {
+          this.items = this.items.filter((item) => item.idProcesso !== idProcessoNumber);
+          console.log("Processo excluído com sucesso.");
+        }
+      } catch (error) {
+        console.error("Erro ao excluir processo:", error);
+      }
+    }
   }
 }
 
