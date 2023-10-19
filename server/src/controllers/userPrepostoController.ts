@@ -87,3 +87,22 @@ export const getUserPrepostoData = async (req: Request, res: Response) => {
       .json({ error: "Erro interno ao obter dados dos usuários prepostos." });
   }
 };
+
+export const deleteUserPreposto= async (req: Request, res: Response) => {
+  try {
+    const { iduserPreposto} = req.params; // Suponha que o parâmetro seja passado na URL
+
+    const userpreposto = await UserPreposto.findByPk(iduserPreposto);
+
+    if (!userpreposto) {
+      return res.status(404).json({ error: "User preposto não encontrado" });
+    }
+
+    await userpreposto.destroy(); // Isso irá excluir o registro do banco de dados
+
+    return res.status(200).json({ message: "Usuário Preposto excluído com sucesso" });
+  } catch (error) {
+    console.error("Erro ao excluir usuário:", error);
+    return res.status(500).json({ error: "Erro interno ao excluir usuário" });
+  }
+};

@@ -46,6 +46,7 @@ export default {
       searchNome: "",
       searchLogin: "",
       items: [],
+      usuarioParaExcluir: null,
     };
   },
   computed: {
@@ -91,8 +92,49 @@ export default {
     editar(item) {
       console.log("Editar:", item);
     },
-    excluir(item) {
-      console.log("Excluir:", item);
+    async excluir(userpreposto) {
+      if (userpreposto && userpreposto.iduserPreposto) {
+        this.usuarioParaExcluir = userpreposto.iduserPreposto;
+        this.confirmarExclusao();
+      } else {
+        console.error("ID do usuário inválido.");
+      }
+    },
+
+    confirmarExclusao() {
+      // Verifique se há um usuário para excluir
+      if (this.usuarioParaExcluir) {
+        if (confirm("Tem certeza de que deseja excluir este usuário?")) {
+          this.excluirUsuario(this.usuarioParaExcluir);
+        }
+      }
+    },
+    async excluirUsuario(iduserPreposto) {
+      try {
+        if (!iduserPreposto || !this.items) {
+          console.error("ID de usuário ou lista de usuários indefinidos");
+          return;
+        }
+
+        const idUsuario = Number(iduserPreposto);
+
+        if (isNaN(idUsuario)) {
+          console.error("ID de usuário não é um número válido.");
+          return;
+        }
+
+        const response = await this.$api.delete(`/usuarios/${idUsuario}`);
+
+        if (response.status === 200) {
+          this.items = this.items.filter((item) => item.id !== idUsuario);
+          console.log("Usuário excluído com sucesso.");
+          this.fetchUserData();
+        } else {
+          console.error("Erro ao excluir usuário.");
+        }
+      } catch (error) {
+        console.error("Erro ao excluir usuário:", error);
+      }
     }
   }
 };

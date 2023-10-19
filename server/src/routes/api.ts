@@ -17,6 +17,7 @@ router.post(
 );
 
 router.get("/usuarios", Auth.private, UserPreposto.getUserPrepostoData);
+router.delete("/usuarios/:iduserPreposto", UserPreposto.deleteUserPreposto);
 
 router.post("/cadastro/processo", Auth.private, Processo.registerProcesso);
 router.get("/processos", Processo.getProcessos);

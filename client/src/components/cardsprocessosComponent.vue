@@ -14,7 +14,7 @@
             </b-card>
 
             <!-- Card 3: Processos Arquivados -->
-            <b-card class="card-item" border-variant="danger" header="Processos Arquivados" bg-variant="danger"
+            <b-card class="card-item" border-variant="danger" header="Processos Baixados" bg-variant="danger"
                 header-bg-variant="white" header-text-variant="danger" align="center">
                 <b-card-text>{{ processosBaixados }}</b-card-text>
             </b-card>

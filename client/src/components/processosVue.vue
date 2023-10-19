@@ -45,14 +45,27 @@
           <b-icon @click="visualizar(props.item)" class="icon" icon="eye"></b-icon>
           <b-icon @click="editar(props.item)" class="icon" icon="pencil-square"></b-icon>
           <b-icon @click="excluir(props.item)" class="icon" icon="trash-fill"></b-icon>
+
         </template>
       </b-table>
     </b-container>
+    <b-modal v-model="isModalVisible" title="Detalhes do Processo" @hide="fecharModalVisualizacao">
+      <div v-if="processoSelecionado">
+        <p>Nº do Processo: {{ processoSelecionado.nProcesso }}</p>
+        <p>Nome do Autor: {{ processoSelecionado.nameAutor }}</p>
+        <p>Nome do Reu: {{ processoSelecionado.nameReu }}</p>
+        <p>Data de cadastro: {{ processoSelecionado.createdAt}}</p>
+        <p>Situação: {{ processoSelecionado.situacao}}</p>
+
+        <!-- Add more details of the process here if necessary -->
+      </div>
+    </b-modal>
   </div>
 </template>
 
 <script>
 import { parseISO, format } from "date-fns";
+
 export default {
   name: "processosVue",
   data() {
@@ -63,6 +76,8 @@ export default {
       input4: "",
       selectedDate: null,
       processoParaExcluir: null,
+      processoSelecionado: {},
+      isModalVisible: false,
 
       fields: [
         {
@@ -157,9 +172,17 @@ export default {
       this.selectedDate = null;
       this.items = [...this.originalItems];
     },
-    visualizar() {
-      // Lógica do clique aqui
-      console.log("Ícone clicado!");
+    visualizar(processo) {
+      if (processo) {
+        this.processoSelecionado = processo;
+        this.isModalVisible = true; // Set to true to show the modal
+      } else {
+        console.error('Processo é nulo.');
+      }
+    },
+    fecharModalVisualizacao() {
+      // Define o processoSelecionado como null para fechar o modal
+      this.processoSelecionado = false;
     },
     editar() {
       // Lógica do clique aqui
