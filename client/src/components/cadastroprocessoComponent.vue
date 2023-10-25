@@ -19,6 +19,10 @@
                     <option v-for="situacao in situacoes" :key="situacao" :value="situacao">{{ situacao }}</option>
                 </b-form-select>
             </b-form-group>
+            <b-form-group label="Anexos" label-for="anexos">
+                <b-form-file id="anexos" v-model="processo.anexos" required accept=".pdf, .doc, .docx, .jpg, .png"
+                    placeholder class="no-placeholder"></b-form-file>
+            </b-form-group>
 
             <b-form-group>
                 <b-button type="submit" variant="primary">Cadastrar</b-button>
@@ -30,22 +34,24 @@
   
 <script>
 export default {
-    name:"cadastroprocessoComponent",
+    name: "cadastroprocessoComponent",
     data() {
         return {
             processo: {
-                numeroProcesso:'',
+                numeroProcesso: '',
                 nomeAutor: '',
                 nomeReu: '',
                 situacao: null,
+                anexos: null,
             },
             situacoes: [],
         };
     },
     created() {
-        this.carregarSituacoes(); 
+        this.carregarSituacoes();
     },
     methods: {
+     
         async registerProcesso() {
             try {
 
@@ -81,16 +87,17 @@ export default {
         },
         carregarSituacoes() {
             // Exemplo de carregamento manual:
-            this.situacoes = ['Selecione uma', 'Ativo','Baixado'];
+            this.situacoes = ['Selecione uma', 'Ativo', 'Baixado'];
         },
     }
 }
 </script>
 
 <style scoped>
-.geralP{
+.geralP {
     margin: 40px;
 }
+
 form {
     margin-top: 50px;
 }
@@ -102,5 +109,9 @@ button {
 
 h2 {
     margin-top: 20px;
+}
+
+.no-placeholder .form-control-placeholder {
+    display: none;
 }
 </style>

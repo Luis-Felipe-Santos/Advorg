@@ -49,16 +49,45 @@
         </template>
       </b-table>
     </b-container>
-    <b-modal v-model="isModalVisible" title="Detalhes do Processo" @hide="fecharModalVisualizacao">
-      <div v-if="processoSelecionado">
-        <p>Nº do Processo: {{ processoSelecionado.nProcesso }}</p>
-        <p>Nome do Autor: {{ processoSelecionado.nameAutor }}</p>
-        <p>Nome do Reu: {{ processoSelecionado.nameReu }}</p>
-        <p>Data de cadastro: {{ processoSelecionado.createdAt}}</p>
-        <p>Situação: {{ processoSelecionado.situacao}}</p>
+    <b-modal id="modal-lg" size="lg" centered v-model="isModalVisible" title="Detalhes do processo"
+      @hide="fecharModalVisualizacao">
 
-        <!-- Add more details of the process here if necessary -->
+      <div v-if="processoSelecionado">
+        <form>
+          <div class="form-group-processos">
+            <label for="nProcesso"><strong>Nº do Processo:</strong></label>
+            <input type="text" id="nProcesso" v-model="processoSelecionado.nProcesso" disabled>
+          </div>
+    
+          <div class="form-group-processos">
+            <label for="nameAutor"><strong>Nome do Autor:</strong></label>
+            <input type="text" id="nameAutor" v-model="processoSelecionado.nameAutor" disabled>
+          </div>
+    
+          <div class="form-group-processos">
+            <label for="nameReu"><strong>Nome do Réu:</strong></label>
+            <input type="text" id="nameReu" v-model="processoSelecionado.nameReu" disabled>
+          </div>
+    
+          <div class="form-group-processos">
+            <label for="createdAt"><strong>Data de Cadastro:</strong></label>
+            <input type="text" id="createdAt" v-model="processoSelecionado.createdAt" disabled>
+          </div>
+    
+          <div class="form-group-processos">
+            <label for="situacao"><strong>Situação:</strong></label>
+            <input id="situacao" v-model="processoSelecionado.situacao" disabled>
+          </div>
+
+          <div class="form-group-processos">
+            <label for="createdBy"><strong>Usuário/Operador:</strong></label>
+            <input id="createdBy" v-model="processoSelecionado.createdBy" disabled>
+          </div>
+        </form>
       </div>
+      <template #modal-footer>
+        <button class="btn btn-secondary" @click="fecharModalVisualizacao">Fechar</button>
+      </template>
     </b-modal>
   </div>
 </template>
@@ -181,8 +210,7 @@ export default {
       }
     },
     fecharModalVisualizacao() {
-      // Define o processoSelecionado como null para fechar o modal
-      this.processoSelecionado = false;
+      this.isModalVisible = false;
     },
     editar() {
       // Lógica do clique aqui
@@ -257,5 +285,20 @@ h2 {
 .icon {
   margin-left: 10px;
   cursor: pointer;
+}
+
+.form-group-processos {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.form-group-processos label {
+  margin-right: 10px;
+  width: 150px; /* Defina a largura desejada para os rótulos */
+}
+
+.form-group-processos input, .form-group select {
+  flex: 1;
 }
 </style>
