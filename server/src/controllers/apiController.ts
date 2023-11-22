@@ -26,6 +26,7 @@ export const register = async (req: Request, res: Response) => {
         email,
         cidade,
         password: passwordHash,
+        permissao: "Master",
       });
       const token = generateToken({ id: newUser.id });
 

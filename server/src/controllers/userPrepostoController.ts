@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import { hash } from "bcrypt";
 import dotenv from "dotenv";
-import { UserPreposto } from "../models/UserPreposto";
+import { UserPreposto, UserInstancePreposto } from "../models/UserPreposto";
 import { generateToken } from "../config/passport";
 import { format, parseISO } from "date-fns";
+import { User } from "../models/User";
+
+
 
 dotenv.config();
 
@@ -64,45 +67,57 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
       .json({ error: "Erro interno ao cadastrar usuário preposto." });
   }
 };
-
 export const getUserPrepostoData = async (req: Request, res: Response) => {
   try {
-    // Recupere todos os usuários prepostos da tabela
-    const usuariosprepostos = await UserPreposto.findAll();
+    const loggedInUserId = res.locals.user.id;
+
+    // Retrieve preposto users associated with the logged-in user
+    const usuariosprepostos: UserInstancePreposto[] = await UserPreposto.findAll({
+      where: { users_id: loggedInUserId },
+      include: [{ model: User, as: 'user', attributes: ['id', 'name'] }],
+    });
+
+    // Map and format the retrieved data
     const usuariosprepostosFormatados = usuariosprepostos.map((usuario) => ({
-      ...usuario.toJSON(),
+      iduserPreposto: usuario.iduserPreposto,
+      name: usuario.name,
+      email: usuario.email,
+      cidade: usuario.cidade,
+      permissao: usuario.permissao,
       createdAt: format(parseISO(usuario.createdAt.toString()), "dd/MM/yyyy"),
+      userId: usuario.user ? usuario.users_id : null,
+      userName: usuario.user ? usuario.user.name : null,
     }));
-    // Se não houver usuários prepostos, retorne uma resposta vazia ou uma mensagem adequada
+
+    // If no preposto users are found, return a 404 response
     if (!usuariosprepostos || usuariosprepostos.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "Nenhum usuário preposto encontrado." });
+      return res.status(404).json({ error: "Nenhum usuário preposto encontrado." });
     }
+
+    // Return the formatted preposto user data
     return res.status(200).json(usuariosprepostosFormatados);
   } catch (error) {
     console.error("Erro ao obter dados dos usuários prepostos:", error);
-    return res
-      .status(500)
-      .json({ error: "Erro interno ao obter dados dos usuários prepostos." });
+    return res.status(500).json({ error: "Erro interno ao obter dados dos usuários prepostos." });
   }
 };
 
-export const deleteUserPreposto= async (req: Request, res: Response) => {
+
+export const deleteUserPreposto = async (req: Request, res: Response) => {
   try {
-    const { iduserPreposto} = req.params; // Suponha que o parâmetro seja passado na URL
+    const { iduserPreposto } = req.params; 
 
     const userpreposto = await UserPreposto.findByPk(iduserPreposto);
 
     if (!userpreposto) {
-      return res.status(404).json({ error: "User preposto não encontrado" });
+      return res.status(404).json({ error: "Usuário preposto não encontrado." });
     }
 
-    await userpreposto.destroy(); // Isso irá excluir o registro do banco de dados
+    await userpreposto.destroy(); 
 
-    return res.status(200).json({ message: "Usuário Preposto excluído com sucesso" });
+    return res.status(204).send(); 
   } catch (error) {
-    console.error("Erro ao excluir usuário:", error);
-    return res.status(500).json({ error: "Erro interno ao excluir usuário" });
+    console.error("Erro ao excluir usuário preposto:", error);
+    return res.status(500).json({ error: "Erro interno ao excluir usuário preposto." });
   }
 };

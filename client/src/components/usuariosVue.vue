@@ -17,7 +17,9 @@
             <th>Login</th>
             <th>Cadastro</th>
             <th>Permissão</th>
+            <th>Cadastrado Por</th>
             <th>Eventos</th>
+
           </tr>
         </thead>
         <tbody>
@@ -26,6 +28,7 @@
             <td>{{ item.email }}</td>
             <td>{{ item.createdAt }}</td>
             <td>{{ item.permissao }}</td>
+            <td> {{ item.userName }}</td>
             <td>
               <b-icon @click="visualizar(item)" class="icon" icon="eye"></b-icon>
               <b-icon @click="editar(item)" class="icon" icon="pencil-square"></b-icon>
@@ -126,9 +129,10 @@ export default {
         const response = await this.$api.delete(`/usuarios/${idUsuario}`);
 
         if (response.status === 200) {
-          this.items = this.items.filter((item) => item.id !== idUsuario);
+          const updatedItems = this.items.filter((item) => item.id !== idUsuario);
+
+          this.$set(this, 'items', updatedItems);
           console.log("Usuário excluído com sucesso.");
-          this.fetchUserData();
         } else {
           console.error("Erro ao excluir usuário.");
         }
