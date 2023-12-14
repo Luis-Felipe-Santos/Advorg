@@ -1,5 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '../instances/mysql';
+import { User } from './User';
 
 export interface ProcessoInstance extends Model {
     idProcesso: number;
@@ -9,6 +10,8 @@ export interface ProcessoInstance extends Model {
     situacao: string;
     createdBy: string,
     createdAt: Date,
+    users_id: number;
+    user?: typeof User & { name: string | null };
 }
 
 export const Processo = sequelize.define<ProcessoInstance>('Processo', {
@@ -22,7 +25,7 @@ export const Processo = sequelize.define<ProcessoInstance>('Processo', {
     },
     nameAutor: {
         type: DataTypes.STRING,
-      
+
     },
     nameReu: {
         type: DataTypes.STRING,
@@ -36,7 +39,16 @@ export const Processo = sequelize.define<ProcessoInstance>('Processo', {
     createdAt: {
         type: DataTypes.DATE,
     },
+    users_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false, // adjust as needed
+        references: {
+            model: 'users', // adjust if your actual table name is different
+            key: 'id',
+        },
+    },
 }, {
     tableName: 'processos',
     timestamps: false
 });
+Processo.belongsTo(User, { foreignKey: 'users_id', as: 'user' });

@@ -40,7 +40,7 @@
     </b-container>
   </div>
 </template>
-  
+
 <script>
 export default {
   name: "usuariosVue",
@@ -144,7 +144,7 @@ export default {
 };
 
 </script>
-  
+
 <style scoped>
 * {
   padding: 0;

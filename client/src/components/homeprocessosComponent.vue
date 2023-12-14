@@ -32,7 +32,13 @@ export default {
     methods: {
         async getdataProcessos() {
             try {
-                const response = await this.$api.get('/processos');
+                const token = localStorage.getItem("authToken");
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+                const response = await this.$api.get('/processos', config);
                 this.items = response.data.processos.map((processo) => ({
                     ...processo,
                     partes: `${processo.nameAutor} x ${processo.nameReu}`,

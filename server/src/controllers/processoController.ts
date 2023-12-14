@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import { Processo } from "../models/Processo";
+import { Processo, ProcessoInstance } from "../models/Processo";
 import { format, parseISO } from "date-fns";
+import { User } from "../models/User";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ export const registerProcesso = async (req: Request, res: Response) => {
   try {
     const createdBy = res.locals.user.name;
     const createdAt = new Date();
+    const users_id = res.locals.user.id;
 
     const novoProcesso = await Processo.create({
       nProcesso,
@@ -25,6 +27,7 @@ export const registerProcesso = async (req: Request, res: Response) => {
       situacao,
       createdBy,
       createdAt,
+      users_id,
     });
 
     return res.status(201).json({
@@ -40,25 +43,39 @@ export const registerProcesso = async (req: Request, res: Response) => {
 };
 export const getProcessos = async (req: Request, res: Response) => {
   try {
-    const processos = await Processo.findAll();
-    console.log(processos);
+
+    const loggedInUserId = res.locals.user?.id;
+
+    if (!res.locals.user) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+
+    const processos: ProcessoInstance[] = await Processo.findAll({
+      where: { users_id: loggedInUserId },
+      include: [{ model: User, as: 'user', attributes: ['id', 'name'] }],
+    });
+
+    const processosFormatados = processos.map((processo) => ({
+      idProcesso: processo.idProcesso,
+      nProcesso: processo.nProcesso,
+      nameAutor: processo.nameAutor,
+      nameReu: processo.nameReu,
+      situacao: processo.situacao,
+      createdBy: processo.createdBy,
+      createdAt: format(parseISO(processo.createdAt.toString()), "dd/MM/yyyy"),
+      userId: processo.user ? processo.users_id : null,
+      userName: processo.user ? processo.user.name : null,
+    }));
+
     let activeCount = 0;
     let archivedCount = 0;
 
-    const processosFormatados = processos.map((processo) => {
+    processos.forEach((processo) => {
       if (processo.situacao === "Ativo") {
         activeCount++;
       } else if (processo.situacao === "Baixado") {
         archivedCount++;
       }
-
-      return {
-        ...processo.toJSON(),
-        createdAt: format(
-          parseISO(processo.createdAt.toString()),
-          "dd/MM/yyyy"
-        ),
-      };
     });
 
     const processCounts = {

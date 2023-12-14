@@ -39,7 +39,13 @@ export default {
     methods: {
         async fetchProcessData() {
             try {
-                const response = await this.$api.get('/processos');
+                const token = localStorage.getItem("authToken");
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+                const response = await this.$api.get('/processos', config);
                 const processCounts = response.data.counts;
 
                 this.processosAtivos = processCounts.active;

@@ -20,7 +20,7 @@ router.get("/usuarios", Auth.private, UserPreposto.getUserPrepostoData);
 router.delete("/usuarios/:iduserPreposto", UserPreposto.deleteUserPreposto);
 
 router.post("/cadastro/processo", Auth.private, Processo.registerProcesso);
-router.get("/processos", Processo.getProcessos);
+router.get("/processos", Auth.private, Processo.getProcessos);
 router.delete("/processos/:id", Processo.deleteProcesso);
 
 router.get("/profile", Auth.private, ApiController.getProfile);

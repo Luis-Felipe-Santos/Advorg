@@ -19,10 +19,7 @@
                     <option v-for="situacao in situacoes" :key="situacao" :value="situacao">{{ situacao }}</option>
                 </b-form-select>
             </b-form-group>
-            <b-form-group label="Anexos" label-for="anexos">
-                <b-form-file id="anexos" v-model="processo.anexos" required accept=".pdf, .doc, .docx, .jpg, .png"
-                    placeholder class="no-placeholder"></b-form-file>
-            </b-form-group>
+
 
             <b-form-group>
                 <b-button type="submit" variant="primary">Cadastrar</b-button>
@@ -31,7 +28,7 @@
         </b-form>
     </div>
 </template>
-  
+
 <script>
 export default {
     name: "cadastroprocessoComponent",
@@ -51,7 +48,7 @@ export default {
         this.carregarSituacoes();
     },
     methods: {
-     
+
         async registerProcesso() {
             try {
 
