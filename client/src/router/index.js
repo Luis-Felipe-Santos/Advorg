@@ -9,8 +9,6 @@ import processosView from '@/views/processosView.vue'
 import usuariosView from '@/views/usuariosView.vue'
 
 
-
-
 Vue.use(VueRouter)
 
 const routes = [
@@ -51,7 +49,7 @@ const routes = [
     component: usuariosView
 
   },
-  
+
 ]
 
 const router = new VueRouter({

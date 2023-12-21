@@ -13,8 +13,6 @@
         </b-col>
 
       </b-row>
-     
-      
     </b-container>
   </div>
 </template>
@@ -32,7 +30,7 @@ export default {
     menulateralComponent,
     datetimeComponent,
     cardsprocessosComponent,
-    homeprocessosComponent 
+    homeprocessosComponent
   },
 };
 </script>

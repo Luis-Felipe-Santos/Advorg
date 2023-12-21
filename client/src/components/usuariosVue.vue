@@ -86,61 +86,76 @@ export default {
           console.error('Failed to fetch user data:', response.statusText);
         }
       } catch (error) {
-        console.error('Error while fetching user data:', error);
-      }
-    },
-    visualizar(item) {
-      console.log("Visualizar:", item);
-    },
-    editar(item) {
-      console.log("Editar:", item);
-    },
-    async excluir(userpreposto) {
-      if (userpreposto && userpreposto.iduserPreposto) {
-        this.usuarioParaExcluir = userpreposto.iduserPreposto;
-        this.confirmarExclusao();
-      } else {
-        console.error("ID do usuário inválido.");
-      }
-    },
+        console.error('Erro ao acessar essa página:', error);
 
-    confirmarExclusao() {
-      // Verifique se há um usuário para excluir
-      if (this.usuarioParaExcluir) {
-        if (confirm("Tem certeza de que deseja excluir este usuário?")) {
-          this.excluirUsuario(this.usuarioParaExcluir);
-        }
-      }
-    },
-    async excluirUsuario(iduserPreposto) {
-      try {
-        if (!iduserPreposto || !this.items) {
-          console.error("ID de usuário ou lista de usuários indefinidos");
-          return;
-        }
+        let errorMessage = 'Erro ao acessar pagina';
 
-        const idUsuario = Number(iduserPreposto);
-
-        if (isNaN(idUsuario)) {
-          console.error("ID de usuário não é um número válido.");
-          return;
-        }
-
-        const response = await this.$api.delete(`/usuarios/${idUsuario}`);
-
-        if (response.status === 200) {
-          const updatedItems = this.items.filter((item) => item.id !== idUsuario);
-
-          this.$set(this, 'items', updatedItems);
-          console.log("Usuário excluído com sucesso.");
+        if (error.response) {
+          // O servidor respondeu com um status de erro
+          console.error('Erro de resposta do servidor:', error.response.data);
+          errorMessage = error.response.data.error || errorMessage;
+        } else if (error.request) {
+          // A solicitação foi feita, mas não houve resposta do servidor
+          console.error('Sem resposta do servidor:', error.request);
         } else {
-          console.error("Erro ao excluir usuário.");
+          // Algo aconteceu ao configurar a solicitação que acionou um erro
+          console.error('Erro ao configurar a solicitação:', error.message);
         }
-      } catch (error) {
-        console.error("Erro ao excluir usuário:", error);
+        alert(errorMessage);
+    }
+  },
+  visualizar(item) {
+    console.log("Visualizar:", item);
+  },
+  editar(item) {
+    console.log("Editar:", item);
+  },
+  async excluir(userpreposto) {
+    if (userpreposto && userpreposto.iduserPreposto) {
+      this.usuarioParaExcluir = userpreposto.iduserPreposto;
+      this.confirmarExclusao();
+    } else {
+      console.error("ID do usuário inválido.");
+    }
+  },
+
+  confirmarExclusao() {
+    // Verifique se há um usuário para excluir
+    if (this.usuarioParaExcluir) {
+      if (confirm("Tem certeza de que deseja excluir este usuário?")) {
+        this.excluirUsuario(this.usuarioParaExcluir);
       }
     }
+  },
+  async excluirUsuario(iduserPreposto) {
+    try {
+      if (!iduserPreposto || !this.items) {
+        console.error("ID de usuário ou lista de usuários indefinidos");
+        return;
+      }
+
+      const idUsuario = Number(iduserPreposto);
+
+      if (isNaN(idUsuario)) {
+        console.error("ID de usuário não é um número válido.");
+        return;
+      }
+
+      const response = await this.$api.delete(`/usuarios/${idUsuario}`);
+
+      if (response.status === 200) {
+        const updatedItems = this.items.filter((item) => item.id !== idUsuario);
+
+        this.$set(this, 'items', updatedItems);
+        console.log("Usuário excluído com sucesso.");
+      } else {
+        console.error("Erro ao excluir usuário.");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir usuário:", error);
+    }
   }
+}
 };
 
 </script>

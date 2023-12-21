@@ -74,19 +74,32 @@ export default {
                 alert('Processo Cadastrado com sucesso');
             } catch (error) {
                 console.error('Erro ao cadastrar processo:', error);
-                alert('O processo informado já existe');
+
+                let errorMessage = 'Ocorreu um erro ao cadastrar um novo processo.';
+
+                if (error.response) {
+                    // O servidor respondeu com um status de erro
+                    console.error('Erro de resposta do servidor:', error.response.data);
+                    errorMessage = error.response.data.error || errorMessage;
+                } else if (error.request) {
+                    // A solicitação foi feita, mas não houve resposta do servidor
+                    console.error('Sem resposta do servidor:', error.request);
+                } else {
+                    // Algo aconteceu ao configurar a solicitação que acionou um erro
+                    console.error('Erro ao configurar a solicitação:', error.message);
+                }
+                alert(errorMessage);
             }
 
-        },
-        submitForm() {
-            // Lógica para enviar o formulário de cadastro
-            // Você pode acessar os valores do formulário em this.usuario
-        },
-        carregarSituacoes() {
-            // Exemplo de carregamento manual:
-            this.situacoes = ['Selecione uma', 'Ativo', 'Baixado'];
-        },
-    }
+    },
+    submitForm() {
+        // Lógica para enviar o formulário de cadastro
+        // Você pode acessar os valores do formulário em this.usuario
+    },
+    carregarSituacoes() {
+        this.situacoes = ['Selecione uma', 'Ativo', 'Baixado'];
+    },
+}
 }
 </script>
 

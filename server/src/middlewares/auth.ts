@@ -2,8 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import JWT from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User } from "../models/User";
+import { UserPreposto } from "../models/UserPreposto";
 
 dotenv.config();
+
 export const Auth = {
   private: async (req: Request, res: Response, next: NextFunction) => {
     console.log("Middleware de autenticação iniciado");
@@ -16,15 +18,25 @@ export const Auth = {
       const [authType, token] = req.headers.authorization.split(" ");
       if (authType === "Bearer") {
         try {
-          const decodedToken = JWT.verify(
+          const { id, permissao } = JWT.verify(
             token,
             process.env.JWT_SECRET as string
-          ) as { id: number };
+          ) as { id: number; permissao: string };
 
-          const user = await User.findOne({ where: { id: decodedToken.id } });
+          console.log("Token decodificado:", { id, permissao });
 
-          if (user) {
+          const user = await User.findOne({ where: { id } });
+
+          if (!user) {
+            const preposto = await UserPreposto.findOne({ where: { id } });
+            if (preposto) {
+              res.locals.user = preposto;
+              res.locals.permissao = permissao;
+              success = true;
+            }
+          } else {
             res.locals.user = user;
+            res.locals.permissao = permissao;
             success = true;
           }
         } catch (err) {
@@ -33,6 +45,7 @@ export const Auth = {
         }
       }
     }
+
     if (success) {
       next();
     } else {

@@ -31,7 +31,7 @@
         </form>
     </div>
 </template>
-  
+
 <script>
 export default {
     name: "edicaouserComponent",
@@ -41,9 +41,9 @@ export default {
                 name: '',
                 email: '',
                 cidade: '',
-                
+
             },
-            usuarioOriginal: {}, 
+            usuarioOriginal: {},
             novaSenha: '',
             showSuccessModal: false,
             successTimeout: null,
@@ -101,6 +101,22 @@ export default {
 
             } catch (error) {
                 console.error("Erro ao atualizar perfil:", error);
+
+                let errorMessage = 'Ocorreu um erro ao atualizar o perfil.';
+
+                if (error.response) {
+                    // O servidor respondeu com um status de erro
+                    console.error('Erro de resposta do servidor:', error.response.data);
+                    errorMessage = error.response.data.error || errorMessage;
+                } else if (error.request) {
+                    // A solicitação foi feita, mas não houve resposta do servidor
+                    console.error('Sem resposta do servidor:', error.request);
+                } else {
+                    // Algo aconteceu ao configurar a solicitação que acionou um erro
+                    console.error('Erro ao configurar a solicitação:', error.message);
+                }
+
+                alert(errorMessage);
             }
         },
 

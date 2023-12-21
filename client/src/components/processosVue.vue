@@ -58,22 +58,22 @@
             <label for="nProcesso"><strong>Nº do Processo:</strong></label>
             <input type="text" id="nProcesso" v-model="processoSelecionado.nProcesso" disabled>
           </div>
-    
+
           <div class="form-group-processos">
             <label for="nameAutor"><strong>Nome do Autor:</strong></label>
             <input type="text" id="nameAutor" v-model="processoSelecionado.nameAutor" disabled>
           </div>
-    
+
           <div class="form-group-processos">
             <label for="nameReu"><strong>Nome do Réu:</strong></label>
             <input type="text" id="nameReu" v-model="processoSelecionado.nameReu" disabled>
           </div>
-    
+
           <div class="form-group-processos">
             <label for="createdAt"><strong>Data de Cadastro:</strong></label>
             <input type="text" id="createdAt" v-model="processoSelecionado.createdAt" disabled>
           </div>
-    
+
           <div class="form-group-processos">
             <label for="situacao"><strong>Situação:</strong></label>
             <input id="situacao" v-model="processoSelecionado.situacao" disabled>
@@ -156,7 +156,13 @@ export default {
   methods: {
     async fetchInitialData() {
       try {
-        const response = await this.$api.get('/processos');
+        const token = localStorage.getItem("authToken");
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        const response = await this.$api.get('/processos', config);
         this.items = response.data.processos;
 
         this.originalItems = [...response.data.processos];
@@ -295,10 +301,12 @@ h2 {
 
 .form-group-processos label {
   margin-right: 10px;
-  width: 150px; /* Defina a largura desejada para os rótulos */
+  width: 150px;
+  /* Defina a largura desejada para os rótulos */
 }
 
-.form-group-processos input, .form-group select {
+.form-group-processos input,
+.form-group select {
   flex: 1;
 }
 </style>

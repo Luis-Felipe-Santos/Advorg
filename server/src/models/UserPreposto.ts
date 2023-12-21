@@ -3,7 +3,7 @@ import { sequelize } from '../instances/mysql';
 import { User } from './User';
 
 export interface UserInstancePreposto extends Model {
-    iduserPreposto: number;
+    id: number;
     name: string,
     cidade: string,
     email: string;
@@ -15,7 +15,7 @@ export interface UserInstancePreposto extends Model {
 }
 
 export const UserPreposto = sequelize.define<UserInstancePreposto>('UserPreposto', {
-    iduserPreposto: {
+    id: {
         primaryKey: true,
         autoIncrement: true,
         type: DataTypes.INTEGER

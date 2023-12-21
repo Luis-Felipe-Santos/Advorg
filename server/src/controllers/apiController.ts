@@ -21,6 +21,7 @@ export const register = async (req: Request, res: Response) => {
 
     if (!hasUser) {
       const passwordHash = await hash(password, 10);
+      console.log("password:", typeof password);
       const newUser = await User.create({
         name,
         email,
@@ -72,16 +73,16 @@ export const login = async (req: Request, res: Response) => {
 
       if (preposto) {
         const isPasswordValid = await compare(password, preposto.password);
-
         console.log("Senha fornecida durante o login:", password);
         console.log("Senha hashada no banco de dados:", preposto.password);
         console.log("Verificação de senha:", isPasswordValid);
 
         if (isPasswordValid) {
           const token = generateToken({
-            id: preposto.iduserPreposto,
+            id: preposto.id,
             name: preposto.name,
             cidade: preposto.cidade,
+            permissao: preposto.permissao,
           });
 
           console.log("Token gerado com sucesso:", token);
@@ -104,6 +105,7 @@ export const login = async (req: Request, res: Response) => {
           id: user.id,
           name: user.name,
           cidade: user.cidade,
+          permissao: user.permissao,
         });
 
         console.log("Token gerado com sucesso:", token);

@@ -7,7 +7,6 @@ import { format, parseISO } from "date-fns";
 import { User } from "../models/User";
 
 
-
 dotenv.config();
 
 export const registerUserPreposto = async (req: Request, res: Response) => {
@@ -36,6 +35,7 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
       const passwordHash = await hash(password, 10);
       console.log("Senha hashada:", passwordHash);
       console.log("loggedInUserId:", loggedInUserId);
+      console.log("password:", typeof password);
       const newUserPreposto = await UserPreposto.create({
         name,
         email,
@@ -48,12 +48,12 @@ export const registerUserPreposto = async (req: Request, res: Response) => {
 
       console.log("Novo usuário preposto criado:", newUserPreposto);
 
-      const token = generateToken({ id: newUserPreposto.iduserPreposto });
+      const token = generateToken({ id: newUserPreposto.id});
 
       console.log("Token gerado:", token);
 
       return res.status(201).json({
-        id: newUserPreposto.iduserPreposto,
+        id: newUserPreposto.id,
         token,
         message: "Usuário preposto cadastrado com sucesso!",
       });
@@ -79,7 +79,7 @@ export const getUserPrepostoData = async (req: Request, res: Response) => {
 
     // Map and format the retrieved data
     const usuariosprepostosFormatados = usuariosprepostos.map((usuario) => ({
-      iduserPreposto: usuario.iduserPreposto,
+      id: usuario.id,
       name: usuario.name,
       email: usuario.email,
       cidade: usuario.cidade,
@@ -102,10 +102,9 @@ export const getUserPrepostoData = async (req: Request, res: Response) => {
   }
 };
 
-
 export const deleteUserPreposto = async (req: Request, res: Response) => {
   try {
-    const { iduserPreposto } = req.params; 
+    const { iduserPreposto } = req.params;
 
     const userpreposto = await UserPreposto.findByPk(iduserPreposto);
 
@@ -113,9 +112,9 @@ export const deleteUserPreposto = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Usuário preposto não encontrado." });
     }
 
-    await userpreposto.destroy(); 
+    await userpreposto.destroy();
 
-    return res.status(204).send(); 
+    return res.status(204).send();
   } catch (error) {
     console.error("Erro ao excluir usuário preposto:", error);
     return res.status(500).json({ error: "Erro interno ao excluir usuário preposto." });

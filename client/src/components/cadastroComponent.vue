@@ -31,7 +31,7 @@
         </b-form>
     </div>
 </template>
-  
+
 <script>
 export default {
     data() {
@@ -74,14 +74,29 @@ export default {
                 alert('Usuário Registrado com sucesso');
             } catch (error) {
                 console.error('Erro ao criar a conta:', error);
-                alert('O email informado já possui cadastro');
+
+                let errorMessage = 'Ocorreu um erro ao criar a conta.';
+
+                if (error.response) {
+                    // O servidor respondeu com um status de erro
+                    console.error('Erro de resposta do servidor:', error.response.data);
+                    errorMessage = error.response.data.error || errorMessage;
+                } else if (error.request) {
+                    // A solicitação foi feita, mas não houve resposta do servidor
+                    console.error('Sem resposta do servidor:', error.request);
+                } else {
+                    // Algo aconteceu ao configurar a solicitação que acionou um erro
+                    console.error('Erro ao configurar a solicitação:', error.message);
+                }
+
+                alert(errorMessage);
             }
 
         },
     },
 };
 </script>
-  
+
 <style scoped>
 .geralP {
     margin: 40px;
@@ -100,4 +115,3 @@ h2 {
     margin-top: 20px;
 }
 </style>
-  
