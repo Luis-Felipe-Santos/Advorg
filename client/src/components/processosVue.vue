@@ -252,11 +252,22 @@ export default {
           return;
         }
 
-        const response = await this.$api.delete(`/processos/${idProcessoNumber}`);
+        const token = localStorage.getItem("authToken");
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const response = await this.$api.delete(`/processos/${idProcessoNumber}`, config);
 
         if (response.status === 200) {
           this.items = this.items.filter((item) => item.idProcesso !== idProcessoNumber);
           console.log("Processo excluído com sucesso.");
+        } else if (response.status === 403) {
+          console.error("Permissão negada. Você não tem as permissões necessárias para excluir este processo.");
+        } else {
+          console.error("Erro ao excluir processo:", response.statusText);
         }
       } catch (error) {
         console.error("Erro ao excluir processo:", error);

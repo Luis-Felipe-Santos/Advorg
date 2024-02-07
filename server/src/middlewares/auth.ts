@@ -47,8 +47,10 @@ export const Auth = {
     }
 
     if (success) {
+      console.log("Usuário autenticado com sucesso");
       next();
     } else {
+      console.log("Falha na autenticação do usuário");
       res.status(403).json({ error: "Não autorizado" });
     }
   },

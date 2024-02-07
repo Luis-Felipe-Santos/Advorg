@@ -71,11 +71,22 @@ export const getUserPrepostoData = async (req: Request, res: Response) => {
   try {
     const loggedInUserId = res.locals.user.id;
 
-    // Retrieve preposto users associated with the logged-in user
+    // Retrieve preposto users associated with the logged-in user (master)
     const usuariosprepostos: UserInstancePreposto[] = await UserPreposto.findAll({
       where: { users_id: loggedInUserId },
       include: [{ model: User, as: 'user', attributes: ['id', 'name'] }],
     });
+
+    // If the user is a preposto, also retrieve other prepostos associated with the same master
+    if (res.locals.user.permissao === 'preposto') {
+      const masterId = res.locals.user.users_id;
+      const outrosPrepostos: UserInstancePreposto[] = await UserPreposto.findAll({
+        where: { users_id: masterId },
+        include: [{ model: User, as: 'user', attributes: ['id', 'name'] }],
+      });
+
+      usuariosprepostos.push(...outrosPrepostos);
+    }
 
     // Map and format the retrieved data
     const usuariosprepostosFormatados = usuariosprepostos.map((usuario) => ({

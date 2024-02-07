@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { Processo, ProcessoInstance } from "../models/Processo";
 import { format, parseISO } from "date-fns";
 import { User } from "../models/User";
-
+import { UserPreposto, UserInstancePreposto } from "../models/UserPreposto";
 dotenv.config();
 
 export const registerProcesso = async (req: Request, res: Response) => {
@@ -43,19 +43,46 @@ export const registerProcesso = async (req: Request, res: Response) => {
 };
 export const getProcessos = async (req: Request, res: Response) => {
   try {
+    const loggedInUserId = res.locals.user.id; // ID do usuário logado (preposto ou mestre)
 
-    const loggedInUserId = res.locals.user?.id;
-
-    if (!res.locals.user) {
-      return res.status(401).json({ error: "Usuário não autenticado" });
-    }
-
-    const processos: ProcessoInstance[] = await Processo.findAll({
+    // Recuperar todos os processos do usuário mestre
+    const processosMestre: ProcessoInstance[] = await Processo.findAll({
       where: { users_id: loggedInUserId },
-      include: [{ model: User, as: 'user', attributes: ['id', 'name'] }],
     });
 
-    const processosFormatados = processos.map((processo) => ({
+    // Recuperar o usuário preposto associado ao usuário mestre (se houver)
+    const preposto: UserInstancePreposto | null = await UserPreposto.findOne({
+      where: { id: loggedInUserId }, // Busca pelo ID do preposto
+    });
+
+    // Se for preposto e tiver usuário mestre associado, buscar os processos do usuário mestre
+    if (preposto && preposto.users_id !== loggedInUserId) {
+      const processosMestrePreposto: ProcessoInstance[] = await Processo.findAll({
+        where: { users_id: preposto.users_id },
+      });
+
+      // Combinar os processos do usuário mestre e do usuário mestre associado ao preposto
+      processosMestre.push(...processosMestrePreposto);
+    }
+
+    // Se o usuário logado for um usuário mestre, buscar os processos dos prepostos associados
+    if (!preposto) {
+      const prepostos: UserInstancePreposto[] = await UserPreposto.findAll({
+        where: { users_id: loggedInUserId },
+      });
+
+      // Para cada preposto associado, buscar os processos e adicionar à lista de processos do mestre
+      for (const preposto of prepostos) {
+        const processosPreposto: ProcessoInstance[] = await Processo.findAll({
+          where: { users_id: preposto.id },
+        });
+
+        processosMestre.push(...processosPreposto);
+      }
+    }
+
+    // Formatar e enviar os dados dos processos na resposta HTTP
+    const processosFormatados = processosMestre.map((processo) => ({
       idProcesso: processo.idProcesso,
       nProcesso: processo.nProcesso,
       nameAutor: processo.nameAutor,
@@ -63,14 +90,15 @@ export const getProcessos = async (req: Request, res: Response) => {
       situacao: processo.situacao,
       createdBy: processo.createdBy,
       createdAt: format(parseISO(processo.createdAt.toString()), "dd/MM/yyyy"),
-      userId: processo.user ? processo.users_id : null,
-      userName: processo.user ? processo.user.name : null,
+      userId: processo.users_id,
+      userName: '', // Você pode adicionar o nome do usuário preposto aqui, se necessário
     }));
 
+    // Contagem de processos ativos e arquivados
     let activeCount = 0;
     let archivedCount = 0;
 
-    processos.forEach((processo) => {
+    processosMestre.forEach((processo) => {
       if (processo.situacao === "Ativo") {
         activeCount++;
       } else if (processo.situacao === "Baixado") {
@@ -89,6 +117,7 @@ export const getProcessos = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Erro ao obter dados dos processos" });
   }
 };
+
 
 export const deleteProcesso = async (req: Request, res: Response) => {
   try {

@@ -31,7 +31,8 @@ export const User = sequelize.define<UserInstance>('User', {
     },
     permissao: {
         type: DataTypes.STRING
-    }
+    },
+
 }, {
     tableName: 'users',
     timestamps: false

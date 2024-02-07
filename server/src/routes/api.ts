@@ -24,7 +24,7 @@ router.get("/usuarios", Auth.private,checkPermission(["Master", "Operador"]), Us
 
 
 router.post("/cadastro/processo", Auth.private, checkPermission(["Master", "Operador"]), Processo.registerProcesso);
-router.delete("/processos/:id",Auth.private, checkPermission(["Master", "Operador"]), Processo.deleteProcesso);
+router.delete("/processos/:id", Auth.private, checkPermission(["Master", "Operador"]), Processo.deleteProcesso);
 router.get("/processos", Auth.private, Processo.getProcessos);
 
 

@@ -102,60 +102,59 @@ export default {
           console.error('Erro ao configurar a solicitação:', error.message);
         }
         alert(errorMessage);
-    }
-  },
-  visualizar(item) {
-    console.log("Visualizar:", item);
-  },
-  editar(item) {
-    console.log("Editar:", item);
-  },
-  async excluir(userpreposto) {
-    if (userpreposto && userpreposto.iduserPreposto) {
-      this.usuarioParaExcluir = userpreposto.iduserPreposto;
-      this.confirmarExclusao();
-    } else {
-      console.error("ID do usuário inválido.");
-    }
-  },
-
-  confirmarExclusao() {
-    // Verifique se há um usuário para excluir
-    if (this.usuarioParaExcluir) {
-      if (confirm("Tem certeza de que deseja excluir este usuário?")) {
-        this.excluirUsuario(this.usuarioParaExcluir);
       }
-    }
-  },
-  async excluirUsuario(iduserPreposto) {
-    try {
-      if (!iduserPreposto || !this.items) {
-        console.error("ID de usuário ou lista de usuários indefinidos");
-        return;
-      }
-
-      const idUsuario = Number(iduserPreposto);
-
-      if (isNaN(idUsuario)) {
-        console.error("ID de usuário não é um número válido.");
-        return;
-      }
-
-      const response = await this.$api.delete(`/usuarios/${idUsuario}`);
-
-      if (response.status === 200) {
-        const updatedItems = this.items.filter((item) => item.id !== idUsuario);
-
-        this.$set(this, 'items', updatedItems);
-        console.log("Usuário excluído com sucesso.");
+    },
+    visualizar(item) {
+      console.log("Visualizar:", item);
+    },
+    editar(item) {
+      console.log("Editar:", item);
+    },
+    async excluir(userpreposto) {
+      if (userpreposto && userpreposto.id) {
+        this.usuarioParaExcluir = userpreposto.id;
+        this.confirmarExclusao();
       } else {
-        console.error("Erro ao excluir usuário.");
+        console.error("ID do usuário inválido.");
       }
-    } catch (error) {
-      console.error("Erro ao excluir usuário:", error);
+    },
+
+    confirmarExclusao() {
+      // Verifique se há um usuário para excluir
+      if (this.usuarioParaExcluir) {
+        if (confirm("Tem certeza de que deseja excluir este usuário?")) {
+          this.excluirUsuario(this.usuarioParaExcluir);
+        }
+      }
+    },
+    async excluirUsuario(idUsuario) {
+      try {
+        console.log("Tentando excluir o usuário com ID:", idUsuario);
+
+        if (!idUsuario || !this.items) {
+          console.error("ID de usuário ou lista de usuários indefinidos");
+          return;
+        }
+
+        const response = await this.$api.delete(`/usuarios/${idUsuario}`);
+
+        if (response.status === 204) {
+          // Exclusão bem-sucedida, remove o usuário da lista
+          const updatedItems = this.items.filter((item) => item.id !== idUsuario);
+          this.$set(this, 'items', updatedItems);
+          console.log("Usuário excluído com sucesso.");
+        } else if (response.status === 200) {
+          // Se o status for 200, considera como sucesso
+          console.log("Usuário excluído com sucesso.");
+        } else {
+          console.error("Erro ao excluir usuário. Status:", response.status);
+          console.error("Resposta do servidor:", response.data);
+        }
+      } catch (error) {
+        console.error("Erro ao excluir usuário:", error);
+      }
     }
   }
-}
 };
 
 </script>
