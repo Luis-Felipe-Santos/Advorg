@@ -1,84 +1,78 @@
 <template>
   <div>
-    <h2>Processos</h2>
+      <h2>Processos</h2>
+      <b-container class="custom-container">
+        <b-form>
+          <b-row>
+            <b-col cols="12" sm="6" md="6" lg="3">
+              <b-form-group label="Nº do Processo">
+                <b-form-input v-model="input1"></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col cols="12" sm="6" md="6" lg="4" class="ml-sm-3 mb-3">
+              <b-form-group label="Nome Autor">
+                <b-form-input v-model="input2"></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col cols="12" sm="6" md="6" lg="4">
+              <b-form-group label="Nome Reu">
+                <b-form-input v-model="input3"></b-form-input>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col cols="12" sm="6" md="6" lg="4">
+              <b-form-group label="Data" class="w-100">
+                <b-form-datepicker v-model="selectedDate"
+                  :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }"
+                  class="form-control"></b-form-datepicker>
+              </b-form-group>
+            </b-col>
+            <b-col cols="12" sm="6" md="6" lg="4" class="mb-5">
+              <b-form-group label="Situação">
+                <b-form-input v-model="input4" class="form-control"></b-form-input>
+              </b-form-group>
+            </b-col>
+          </b-row>
+          <b-button @click="submitForm">Buscar</b-button>
+          <b-button class="button2" @click="resetForm">Limpar</b-button>
+        </b-form>
+      </b-container>
     <b-container class="custom-container">
-      <b-form>
-        <b-row>
-          <b-col cols="3">
-            <b-form-group label="Nº do Processo">
-              <b-form-input v-model="input1"></b-form-input>
-            </b-form-group>
-          </b-col>
-          <b-col cols="4" class="ml-3 mb-3">
-            <b-form-group label="Nome Autor">
-              <b-form-input v-model="input2"></b-form-input>
-            </b-form-group>
-          </b-col>
-          <b-col cols="4">
-            <b-form-group label="Nome Reu">
-              <b-form-input v-model="input3"></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="3">
-            <b-form-group label="Data">
-              <b-form-datepicker v-model="selectedDate"
-                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }"
-                class="form-control"></b-form-datepicker>
-            </b-form-group>
-          </b-col>
-          <b-col cols="3" class="mb-5">
-            <b-form-group label="Situação">
-              <b-form-input v-model="input4" class="form-control"></b-form-input>
-            </b-form-group>
-          </b-col>
-        </b-row>
-        <b-button @click="submitForm">Buscar</b-button>
-        <b-button class="button2" @click="resetForm">Limpar</b-button>
-      </b-form>
-    </b-container>
-    <b-container class="custom-container">
+      <div class="table-responsive">
       <b-table striped hover :items="items" :fields="fields">
         <template v-slot:cell(eventos)="props">
-
           <b-icon @click="visualizar(props.item)" class="icon" icon="eye"></b-icon>
           <b-icon @click="editar(props.item)" class="icon" icon="pencil-square"></b-icon>
           <b-icon @click="excluir(props.item)" class="icon" icon="trash-fill"></b-icon>
-
         </template>
       </b-table>
+    </div>
     </b-container>
     <b-modal id="modal-lg" size="lg" centered v-model="isModalVisible" title="Detalhes do processo"
       @hide="fecharModalVisualizacao">
-
       <div v-if="processoSelecionado">
         <form>
           <div class="form-group-processos">
             <label for="nProcesso"><strong>Nº do Processo:</strong></label>
             <input type="text" id="nProcesso" v-model="processoSelecionado.nProcesso" disabled>
           </div>
-
           <div class="form-group-processos">
             <label for="nameAutor"><strong>Nome do Autor:</strong></label>
             <input type="text" id="nameAutor" v-model="processoSelecionado.nameAutor" disabled>
           </div>
-
           <div class="form-group-processos">
             <label for="nameReu"><strong>Nome do Réu:</strong></label>
             <input type="text" id="nameReu" v-model="processoSelecionado.nameReu" disabled>
           </div>
-
           <div class="form-group-processos">
             <label for="createdAt"><strong>Data de Cadastro:</strong></label>
             <input type="text" id="createdAt" v-model="processoSelecionado.createdAt" disabled>
           </div>
-
           <div class="form-group-processos">
             <label for="situacao"><strong>Situação:</strong></label>
             <input id="situacao" v-model="processoSelecionado.situacao" disabled>
           </div>
-
           <div class="form-group-processos">
             <label for="createdBy"><strong>Usuário/Operador:</strong></label>
             <input id="createdBy" v-model="processoSelecionado.createdBy" disabled>
@@ -142,9 +136,7 @@ export default {
           key: 'eventos',
           label: 'Eventos',
           sortable: false,
-
         },
-
       ],
       items: [],
       originalItems: [],
@@ -173,14 +165,12 @@ export default {
 
     async submitForm() {
       try {
-        // Crie um objeto com os parâmetros de filtro
         const filterParams = {
           input1: this.input1,
           input2: this.input2.toLowerCase(),
           input3: this.input3.toLowerCase(),
           input4: this.input4.toLowerCase(),
           selectedDate: this.selectedDate ? format(parseISO(this.selectedDate), "dd/MM/yyyy") : "",
-
         };
 
         const filteredItems = this.originalItems.filter(item => {
@@ -210,7 +200,7 @@ export default {
     visualizar(processo) {
       if (processo) {
         this.processoSelecionado = processo;
-        this.isModalVisible = true; // Set to true to show the modal
+        this.isModalVisible = true;
       } else {
         console.error('Processo é nulo.');
       }
@@ -219,7 +209,6 @@ export default {
       this.isModalVisible = false;
     },
     editar() {
-      // Lógica do clique aqui
       console.log("Editar!");
     },
     async excluir(processo) {
@@ -231,7 +220,6 @@ export default {
       }
     },
     confirmarExclusao() {
-      // Verifique se há um processo para excluir
       if (this.processoParaExcluir) {
         if (confirm("Tem certeza de que deseja excluir este processo?")) {
           this.excluirProcesso(this.processoParaExcluir);
@@ -275,7 +263,6 @@ export default {
     }
   }
 }
-
 </script>
 
 <style scoped>
@@ -292,7 +279,6 @@ h2 {
   margin-top: 40px;
   border: 1px solid #ccc;
   padding: 10px;
-
 }
 
 .button2 {
@@ -313,7 +299,6 @@ h2 {
 .form-group-processos label {
   margin-right: 10px;
   width: 150px;
-  /* Defina a largura desejada para os rótulos */
 }
 
 .form-group-processos input,

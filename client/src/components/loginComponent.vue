@@ -116,7 +116,7 @@ export default {
                     console.log('Successful login');
                     localStorage.setItem('authToken', response.data.token);
                     this.$router.push('/home');
-                } 
+                }
             } catch (error) {
                 console.error('Error during login:', error);
             }
@@ -178,21 +178,24 @@ export default {
     }
 }
 </script>
-  
+
 <style >
 * {
     padding: 0;
     margin: 0;
+    box-sizing: border-box; /* Adicionado para garantir que as dimensões sejam calculadas corretamente */
 }
 
 .logo {
     display: flex;
     align-items: center;
-    position: absolute;
     float: left;
     width: 40vw;
     height: 100vh;
     background: #2B59BD;
+}
+.logo img {
+    max-width: 100%;
 }
 
 .conteudos {
@@ -216,6 +219,9 @@ export default {
 
 .custom-card {
     align-items: center;
+    max-width: 400px; /* Adicionado para manter a largura máxima do cartão */
+    width: 90%; /* Adicionado para garantir que o cartão não ultrapasse a largura máxima */
+    margin: 0 auto; /* Adicionado para centralizar o cartão */
 }
 
 .card {
@@ -256,5 +262,29 @@ export default {
     color: #209cee;
     cursor: pointer;
 }
+
+
+@media (max-width: 768px) {
+    .logo {
+        width: 100%;
+        float: none;
+        height: auto;
+    }
+
+    .telaLogin {
+        width: 100%;
+        float: none;
+        height: auto;
+    }
+
+    .custom-card {
+        margin-top: 50px; /* Adiciona um espaço entre o cartão e o topo da tela */
+    }
+
+    .logo img {
+        max-width: 70%; /* Definindo a largura máxima da imagem */
+        height: auto; /* Altura automática para manter a proporção */
+    }
+}
+
 </style>
-  

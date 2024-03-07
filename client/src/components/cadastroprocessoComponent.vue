@@ -20,6 +20,15 @@
                 </b-form-select>
             </b-form-group>
 
+            <b-form-group label="Anexos" label-for="anexos">
+                <b-form-file
+                    id="anexos"
+                    v-model="processo.anexos"
+                    :state="Boolean(processo.anexos)"
+                    placeholder="Selecione um ou mais arquivos..."
+                    multiple
+                ></b-form-file>
+            </b-form-group>
 
             <b-form-group>
                 <b-button type="submit" variant="primary">Cadastrar</b-button>
@@ -48,28 +57,36 @@ export default {
         this.carregarSituacoes();
     },
     methods: {
-
         async registerProcesso() {
             try {
-
                 const token = localStorage.getItem("authToken");
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
                     },
                 };
 
-                await this.$api.post('/cadastro/processo', {
-                    nProcesso: this.processo.numeroProcesso,
-                    nameAutor: this.processo.nomeAutor,
-                    nameReu: this.processo.nomeReu,
-                    situacao: this.processo.situacao,
-                }, config);
+                const formData = new FormData();
+                formData.append("nProcesso", this.processo.numeroProcesso);
+                formData.append("nameAutor", this.processo.nomeAutor);
+                formData.append("nameReu", this.processo.nomeReu);
+                formData.append("situacao", this.processo.situacao);
+
+                // Adicionando os arquivos selecionados ao FormData
+                if (this.processo.anexos) {
+                    for (let i = 0; i < this.processo.anexos.length; i++) {
+                        formData.append("anexos", this.processo.anexos[i]);
+                    }
+                }
+
+                await this.$api.post('/cadastro/processo', formData, config);
 
                 this.processo.numeroProcesso = '';
                 this.processo.nomeAutor = '';
                 this.processo.nomeReu = '';
                 this.processo.situacao = null;
+                this.processo.anexos = null;
 
                 alert('Processo Cadastrado com sucesso');
             } catch (error) {
@@ -78,20 +95,16 @@ export default {
                 let errorMessage = 'Ocorreu um erro ao cadastrar um novo processo.';
 
                 if (error.response) {
-                    // O servidor respondeu com um status de erro
                     console.error('Erro de resposta do servidor:', error.response.data);
                     errorMessage = error.response.data.error || errorMessage;
                 } else if (error.request) {
-                    // A solicitação foi feita, mas não houve resposta do servidor
                     console.error('Sem resposta do servidor:', error.request);
                 } else {
-                    // Algo aconteceu ao configurar a solicitação que acionou um erro
                     console.error('Erro ao configurar a solicitação:', error.message);
                 }
                 alert(errorMessage);
             }
-
-    },
+        },
     submitForm() {
         // Lógica para enviar o formulário de cadastro
         // Você pode acessar os valores do formulário em this.usuario

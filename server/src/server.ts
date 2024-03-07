@@ -4,7 +4,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import apiRoutes from "./routes/api";
 
+
 dotenv.config();
+
 
 const server = express();
 

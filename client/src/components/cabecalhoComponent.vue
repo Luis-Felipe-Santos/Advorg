@@ -4,7 +4,7 @@
       <b-nav-item><router-link class="router-link-no-underline" to="/home"><img class="logo-img" src="../assets/logo1.png" alt="logo"></router-link></b-nav-item>
       <b-nav-item @click.prevent="perfil"><b-icon icon="pencil"></b-icon> {{ usuario.name }} Cidade: {{ usuario.cidade }}</b-nav-item>
       <b-nav-item><b-icon icon="book"></b-icon> Manual de utilização</b-nav-item>
-      <b-nav-item @click.prevent="sair"><b-icon icon="arrow-bar-right"></b-icon> Sair</b-nav-item>
+      <b-nav-item @click.prevent="sair"><b-icon icon="arrow-bar-right"></b-icon>Sair</b-nav-item>
     </b-nav>
   </div>
 </template>
@@ -15,7 +15,7 @@ export default {
   name: "cabecalhoComponent",
   computed: {
     usuario() {
-      return this.$store.state.usuario; 
+      return this.$store.state.usuario;
     },
   },
   created() {
@@ -52,7 +52,7 @@ export default {
 .logo-img {
   width: 100px;
   height: 100%;
-  
+
 }
 .nav-item {
   display: flex;
@@ -67,4 +67,23 @@ export default {
 .nav-link:hover {
   color: white;
 }
+@media (min-width: 300px) and (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    width: 100vw;
+  }
+  .logo-img {
+    width: 200px;
+    height: 100%;
+    margin-bottom: -40px; /* Adiciona uma margem inferior para separar a imagem dos outros itens */
+    margin-right: 0; /* Remove a margem direita para a imagem ocupar menos espaço */
+  }
+
+  a.nav-link{
+    font-size: 12px;
+  }
+}
+
 </style>

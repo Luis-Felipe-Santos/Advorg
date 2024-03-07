@@ -8,13 +8,13 @@
             </b-card>
 
             <!-- Card 2: Processos Ativos -->
-            <b-card class="card-item" border-variant="success" header="Processos Ativos" bg-variant="success"
+            <b-card class="card-item" border-variant="success" header="Ativos" bg-variant="success"
                 header-bg-variant="white" header-text-variant="success" align="center">
                 <b-card-text>{{ processosAtivos }}</b-card-text>
             </b-card>
 
             <!-- Card 3: Processos Arquivados -->
-            <b-card class="card-item" border-variant="danger" header="Processos Baixados" bg-variant="danger"
+            <b-card class="card-item" border-variant="danger" header="Baixados" bg-variant="danger"
                 header-bg-variant="white" header-text-variant="danger" align="center">
                 <b-card-text>{{ processosBaixados }}</b-card-text>
             </b-card>
@@ -95,4 +95,13 @@ export default {
     font-size: 20px;
     font-weight: bold
 }
+
+  @media (min-width: 300px) and (max-width: 992px) {
+    .card-item {
+      width: 90%; /* Reduzindo a largura dos cards para telas menores */
+    }
+    .card-deck {
+        font-size: 10px;
+    }
+  }
 </style>

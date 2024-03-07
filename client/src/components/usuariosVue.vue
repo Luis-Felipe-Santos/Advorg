@@ -10,6 +10,7 @@
           <b-form-input v-model="searchLogin" placeholder="Pesquisar por Login" />
         </b-col>
       </b-row>
+      <div class="table-responsive">
       <table class="table">
         <thead>
           <tr>
@@ -22,6 +23,7 @@
 
           </tr>
         </thead>
+
         <tbody>
           <tr v-for="item in filteredItems" :key="item.id">
             <td>{{ item.name }}</td>
@@ -37,6 +39,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
     </b-container>
   </div>
 </template>
