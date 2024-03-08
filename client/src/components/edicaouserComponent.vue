@@ -72,7 +72,7 @@ export default {
 
         async submitForm() {
             try {
-                const token = localStorage.getItem("authToken"); // Substitua pelo token real
+                const token = localStorage.getItem("authToken");
 
                 const config = {
                     headers: {

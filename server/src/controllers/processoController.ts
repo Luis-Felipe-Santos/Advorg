@@ -118,6 +118,41 @@ export const getProcessos = async (req: Request, res: Response) => {
   }
 };
 
+export const editProcesso = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params; // Suponha que o parâmetro seja passado na URL
+    const { nProcesso, nameAutor, nameReu, situacao } = req.body;
+
+    // Verificar se todos os campos necessários estão presentes
+    if (!nProcesso || !nameAutor || !nameReu || !situacao) {
+      return res.status(400).json({
+        message: "Erro ao editar processo: Todos os campos são obrigatórios.",
+      });
+    }
+
+    // Encontrar o processo pelo ID
+    const processo = await Processo.findByPk(id);
+
+    if (!processo) {
+      return res.status(404).json({ error: "Processo não encontrado" });
+    }
+
+    // Atualizar os dados do processo
+    processo.nProcesso = nProcesso;
+    processo.nameAutor = nameAutor;
+    processo.nameReu = nameReu;
+    processo.situacao = situacao;
+
+    // Salvar as alterações no banco de dados
+    await processo.save();
+
+    return res.status(200).json({ message: "Processo atualizado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao editar processo:", error);
+    return res.status(500).json({ error: "Erro interno ao editar processo" });
+  }
+};
+
 
 export const deleteProcesso = async (req: Request, res: Response) => {
   try {

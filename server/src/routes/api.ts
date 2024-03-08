@@ -21,11 +21,13 @@ router.post(
 
 router.delete("/usuarios/:iduserPreposto", UserPreposto.deleteUserPreposto);
 router.get("/usuarios", Auth.private,checkPermission(["Master", "Operador"]), UserPreposto.getUserPrepostoData);
+router.put("/usuarios/:id", Auth.private, checkPermission(["Master", "Operador"]), UserPreposto.editUserPreposto);
 
 
 router.post("/cadastro/processo", Auth.private, checkPermission(["Master", "Operador"]), Processo.registerProcesso);
 router.delete("/processos/:id", Auth.private, checkPermission(["Master", "Operador"]), Processo.deleteProcesso);
 router.get("/processos", Auth.private, Processo.getProcessos);
+router.put("/processos/:id", Auth.private, checkPermission(["Master", "Operador"]), Processo.editProcesso);
 
 
 router.get("/profile", Auth.private, ApiController.getProfile);

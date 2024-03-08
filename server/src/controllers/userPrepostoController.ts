@@ -11,7 +11,7 @@ dotenv.config();
 
 export const registerUserPreposto = async (req: Request, res: Response) => {
   const { name, email, cidade, password, permissao } = req.body;
-  const loggedInUserId = res.locals.user.id; // Obtém o ID do usuário logado
+  const loggedInUserId = res.locals.user.id;
 
   console.log("Dados recebidos do frontend:", req.body);
 
@@ -110,6 +110,38 @@ export const getUserPrepostoData = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Erro ao obter dados dos usuários prepostos:", error);
     return res.status(500).json({ error: "Erro interno ao obter dados dos usuários prepostos." });
+  }
+};
+
+export const editUserPreposto = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name, email, permissao } = req.body;
+
+    // Verifica se o ID do usuário a ser editado foi fornecido
+    if (!id) {
+      return res.status(400).json({ error: "ID do usuário não fornecido." });
+    }
+
+    // Verifica se o usuário a ser editado existe
+    const user = await UserPreposto.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ error: "Usuário preposto não encontrado." });
+    }
+
+    // Atualiza os campos do usuário com os novos valores, se fornecidos
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (permissao) user.permissao = permissao;
+
+    // Salva as alterações no banco de dados
+    await user.save();
+
+    return res.status(200).json({ message: "Dados do usuário preposto atualizados com sucesso." });
+  } catch (error) {
+    console.error("Erro ao editar usuário preposto:", error);
+    return res.status(500).json({ error: "Erro interno ao editar dados do usuário preposto." });
   }
 };
 

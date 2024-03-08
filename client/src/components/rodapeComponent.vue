@@ -17,7 +17,7 @@ export default {
 
 footer {
   background-color: #2b59bd;
-  width: 100%;
+  width: 100vw;
   min-height: 100px;
   display: flex;
   flex-direction: column;
@@ -36,7 +36,7 @@ footer p {
 @media (max-width: 768px) {
   footer {
     font-size: 14px;
-    height: auto;
+
   }
 }
 </style>

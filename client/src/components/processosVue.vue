@@ -83,7 +83,40 @@
         <button class="btn btn-secondary" @click="fecharModalVisualizacao">Fechar</button>
       </template>
     </b-modal>
+    <b-modal id="modal-editar" size="lg" centered v-model="isModalEditarVisible" title="Editar processo">
+      <form @submit.prevent="salvarEdicao">
+        <div class="form-group-processos">
+          <label for="nProcessoEdit"><strong>Nº do Processo:</strong></label>
+          <input type="text" id="nProcessoEdit" v-model="processoSelecionadoEdit.nProcesso">
+        </div>
+        <div class="form-group-processos">
+          <label for="nameAutorEdit"><strong>Nome do Autor:</strong></label>
+          <input type="text" id="nameAutorEdit" v-model="processoSelecionadoEdit.nameAutor">
+        </div>
+        <div class="form-group-processos">
+          <label for="nameReuEdit"><strong>Nome do Réu:</strong></label>
+          <input type="text" id="nameReuEdit" v-model="processoSelecionadoEdit.nameReu">
+        </div>
+        <div class="form-group-processos">
+          <label for="createdAtEdit"><strong>Data de Cadastro:</strong></label>
+          <input type="text" id="createdAtEdit" v-model="processoSelecionadoEdit.createdAt" disabled>
+        </div>
+        <div class="form-group-processos">
+          <label for="situacaoEdit"><strong>Situação:</strong></label>
+          <input id="situacaoEdit" v-model="processoSelecionadoEdit.situacao">
+        </div>
+        <div class="form-group-processos">
+          <label for="createdByEdit"><strong>Usuário/Operador:</strong></label>
+          <input id="createdByEdit" v-model="processoSelecionadoEdit.createdBy" disabled>
+        </div>
+      </form>
+      <template #modal-footer>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <button type="button" class="btn btn-secondary" @click="fecharModalEdicao">Cancelar</button>
+      </template>
+    </b-modal>
   </div>
+
 </template>
 
 <script>
@@ -101,6 +134,8 @@ export default {
       processoParaExcluir: null,
       processoSelecionado: {},
       isModalVisible: false,
+      processoSelecionadoEdit: {},
+      isModalEditarVisible: false,
 
       fields: [
         {
@@ -208,9 +243,43 @@ export default {
     fecharModalVisualizacao() {
       this.isModalVisible = false;
     },
-    editar() {
-      console.log("Editar!");
+    editar(processo) {
+      if (processo) {
+        this.processoSelecionadoEdit = { ...processo }; // Faz uma cópia do objeto para evitar alterações diretas
+        this.isModalEditarVisible = true;
+      } else {
+        console.error('Processo é nulo.');
+      }
     },
+    fecharModalEdicao() {
+      this.isModalEditarVisible = false;
+    },
+    async salvarEdicao() {
+      try {
+        const token = localStorage.getItem("authToken");
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        const response = await this.$api.put(`/processos/${this.processoSelecionadoEdit.idProcesso}`, this.processoSelecionadoEdit, config);
+
+        if (response.status === 200) {
+          // Atualize os detalhes do processo na lista exibida
+          const index = this.items.findIndex(item => item.idProcesso === this.processoSelecionadoEdit.idProcesso);
+          if (index !== -1) {
+            this.$set(this.items, index, this.processoSelecionadoEdit);
+          }
+          this.isModalEditarVisible = false;
+          console.log("Processo editado com sucesso.");
+        } else {
+          console.error("Erro ao editar processo:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Erro ao editar processo:", error);
+      }
+    },
+
     async excluir(processo) {
       if (processo && processo.idProcesso) {
         this.processoParaExcluir = processo.idProcesso;
