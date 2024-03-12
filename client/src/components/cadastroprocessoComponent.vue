@@ -2,16 +2,19 @@
     <div class="geralP">
         <h2>Cadastrar novo processo</h2>
         <b-form @submit.prevent="registerProcesso">
+            <div v-if="showSuccessMessage" class="alert alert-success">
+                Processo cadastrado com sucesso!
+            </div>
             <b-form-group label="Número do Processo" label-for="num_processo">
-                <b-form-input id="num_processo" v-model="processo.numeroProcesso" required></b-form-input>
+                <b-form-input id="num_processo" v-model="processo.nProcesso" required></b-form-input>
             </b-form-group>
 
             <b-form-group label="Autor" label-for="nome_autor">
-                <b-form-input id="nome_autor" v-model="processo.nomeAutor" required></b-form-input>
+                <b-form-input id="nome_autor" v-model="processo.nameAutor" required></b-form-input>
             </b-form-group>
 
             <b-form-group label="Reu" label-for="nome_reu">
-                <b-form-input id="nome_reu" v-model="processo.nomeReu" required></b-form-input>
+                <b-form-input id="nome_reu" v-model="processo.nameReu" required></b-form-input>
             </b-form-group>
 
             <b-form-group label="Situação" label-for="input-situacao">
@@ -19,17 +22,6 @@
                     <option v-for="situacao in situacoes" :key="situacao" :value="situacao">{{ situacao }}</option>
                 </b-form-select>
             </b-form-group>
-
-            <b-form-group label="Anexos" label-for="anexos">
-                <b-form-file
-                    id="anexos"
-                    v-model="processo.anexos"
-                    :state="Boolean(processo.anexos)"
-                    placeholder="Selecione um ou mais arquivos..."
-                    multiple
-                ></b-form-file>
-            </b-form-group>
-
             <b-form-group>
                 <b-button type="submit" variant="primary">Cadastrar</b-button>
                 <b-button type="reset" variant="">Cancelar</b-button>
@@ -44,13 +36,13 @@ export default {
     data() {
         return {
             processo: {
-                numeroProcesso: '',
-                nomeAutor: '',
-                nomeReu: '',
+                nProcesso: '',
+                nameAutor: '',
+                nameReu: '',
                 situacao: null,
-                anexos: null,
             },
             situacoes: [],
+            showSuccessMessage: false,
         };
     },
     created() {
@@ -63,32 +55,24 @@ export default {
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        "Content-Type": "multipart/form-data",
+                        "Content-Type": "application/json", // Define o tipo de conteúdo como JSON
                     },
                 };
 
-                const formData = new FormData();
-                formData.append("nProcesso", this.processo.numeroProcesso);
-                formData.append("nameAutor", this.processo.nomeAutor);
-                formData.append("nameReu", this.processo.nomeReu);
-                formData.append("situacao", this.processo.situacao);
+                const data = {
+                    nProcesso: this.processo.nProcesso,
+                    nameAutor: this.processo.nameAutor,
+                    nameReu: this.processo.nameReu,
+                    situacao: this.processo.situacao,
+                };
 
-                // Adicionando os arquivos selecionados ao FormData
-                if (this.processo.anexos) {
-                    for (let i = 0; i < this.processo.anexos.length; i++) {
-                        formData.append("anexos", this.processo.anexos[i]);
-                    }
-                }
+                await this.$api.post('/cadastro/processo', data, config);
 
-                await this.$api.post('/cadastro/processo', formData, config);
-
-                this.processo.numeroProcesso = '';
-                this.processo.nomeAutor = '';
-                this.processo.nomeReu = '';
-                this.processo.situacao = null;
-                this.processo.anexos = null;
-
-                alert('Processo Cadastrado com sucesso');
+                this.showSuccessMessage = true;
+                this.clearForm();
+                setTimeout(() => {
+                    this.showSuccessMessage = false;
+                }, 3000);
             } catch (error) {
                 console.error('Erro ao cadastrar processo:', error);
 
@@ -105,14 +89,16 @@ export default {
                 alert(errorMessage);
             }
         },
-    submitForm() {
-        // Lógica para enviar o formulário de cadastro
-        // Você pode acessar os valores do formulário em this.usuario
-    },
-    carregarSituacoes() {
-        this.situacoes = ['Selecione uma', 'Ativo', 'Baixado'];
-    },
-}
+        clearForm() {
+            this.processo.nProcesso = "";
+            this.processo.nameAutor = "";
+            this.processo.nameReu = "";
+            this.processo.situacao = null;
+        },
+        carregarSituacoes() {
+            this.situacoes = ['Selecione uma', 'Ativo', 'Baixado'];
+        },
+    }
 }
 </script>
 

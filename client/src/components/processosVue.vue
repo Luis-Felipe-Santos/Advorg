@@ -39,6 +39,12 @@
         </b-form>
       </b-container>
     <b-container class="custom-container">
+      <div v-if="!isAuthorized" class="alert alert-danger" role="alert">
+        Você não tem permissão para editar este processo.
+      </div>
+      <div v-if="!editSuccess" class="alert alert-success" role="alert">
+        Processo editado com sucesso!
+      </div>
       <div class="table-responsive">
       <b-table striped hover :items="items" :fields="fields">
         <template v-slot:cell(eventos)="props">
@@ -111,7 +117,7 @@
         </div>
       </form>
       <template #modal-footer>
-        <button type="submit" class="btn btn-primary">Salvar</button>
+        <button type="submit" class="btn btn-primary" @click="salvarEdicao">Salvar</button>
         <button type="button" class="btn btn-secondary" @click="fecharModalEdicao">Cancelar</button>
       </template>
     </b-modal>
@@ -136,6 +142,8 @@ export default {
       isModalVisible: false,
       processoSelecionadoEdit: {},
       isModalEditarVisible: false,
+      isAuthorized: true,
+      editSuccess: true,
 
       fields: [
         {
@@ -262,7 +270,7 @@ export default {
             Authorization: `Bearer ${token}`,
           },
         };
-        const response = await this.$api.put(`/processos/${this.processoSelecionadoEdit.idProcesso}`, this.processoSelecionadoEdit, config);
+        const response = await this.$api.put(`/processosupdate/${this.processoSelecionadoEdit.idProcesso}`, this.processoSelecionadoEdit, config);
 
         if (response.status === 200) {
           // Atualize os detalhes do processo na lista exibida
@@ -271,12 +279,36 @@ export default {
             this.$set(this.items, index, this.processoSelecionadoEdit);
           }
           this.isModalEditarVisible = false;
-          console.log("Processo editado com sucesso.");
-        } else {
-          console.error("Erro ao editar processo:", response.statusText);
+          this.editSuccess = false;
+          setTimeout(() => {
+          this.editSuccess = true;
+        }, 4000);
         }
       } catch (error) {
         console.error("Erro ao editar processo:", error);
+
+        if (error.response && error.response.status === 403) {
+          // Define isAuthorized como falso para exibir a mensagem de erro
+          this.isAuthorized = false;
+          // Fecha o modal
+          this.isModalEditarVisible = false;
+          setTimeout(() => {
+            this.isAuthorized = true;
+          }, 4000);
+        } else {
+          let errorMessage = 'Erro ao acessar página';
+
+          if (error.response) {
+            console.error('Erro de resposta do servidor:', error.response.data);
+            errorMessage = error.response.data.error || errorMessage;
+          } else if (error.request) {
+            console.error('Sem resposta do servidor:', error.request);
+          } else {
+            console.error('Erro ao configurar a solicitação:', error.message);
+          }
+
+          alert(errorMessage);
+        }
       }
     },
 

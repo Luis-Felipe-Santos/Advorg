@@ -2,6 +2,12 @@
     <div class="geralP">
         <h2>Cadastrar novo usuário</h2>
         <b-form @submit.prevent="createAccount">
+            <div v-if="!isAuthorized" class="alert alert-danger" role="alert">
+                Usuário não cadastrado. {{ errorMessage }}
+              </div>
+              <div v-if="showSuccessMessage" class="alert alert-success" role="alert">
+                Usuário registrado com sucesso!
+            </div>
             <b-form-group label="Nome" label-for="input-nome">
                 <b-form-input id="input-nome" v-model="usuario.nome" required></b-form-input>
             </b-form-group>
@@ -44,6 +50,9 @@ export default {
                 permissao: null,
             },
             permissoes: ['Selecione uma', 'Master', 'Operador', 'Visualizador'],
+            isAuthorized: true,
+            errorMessage: '',
+            showSuccessMessage: false,
         };
     },
     methods: {
@@ -65,22 +74,23 @@ export default {
                     permissao: this.usuario.permissao,
                 }, config);
 
-                this.usuario.nome = '';
-                this.usuario.email = '';
-                this.usuario.cidade = '';
-                this.usuario.senha = '';
-                this.usuario.permissao = null;
+                this.showSuccessMessage = true;
+                this.clearForm();
+                setTimeout(() => {
+                    this.showSuccessMessage = false;
+                }, 3000);
 
-                alert('Usuário Registrado com sucesso');
             } catch (error) {
+                this.isAuthorized = false;
+
                 console.error('Erro ao criar a conta:', error);
 
-                let errorMessage = 'Ocorreu um erro ao criar a conta.';
+                this.errorMessage = 'Ocorreu um erro ao criar a conta.';
 
                 if (error.response) {
                     // O servidor respondeu com um status de erro
                     console.error('Erro de resposta do servidor:', error.response.data);
-                    errorMessage = error.response.data.error || errorMessage;
+                    this.errorMessage = error.response.data.error || this.errorMessage;
                 } else if (error.request) {
                     // A solicitação foi feita, mas não houve resposta do servidor
                     console.error('Sem resposta do servidor:', error.request);
@@ -88,11 +98,21 @@ export default {
                     // Algo aconteceu ao configurar a solicitação que acionou um erro
                     console.error('Erro ao configurar a solicitação:', error.message);
                 }
-
-                alert(errorMessage);
+                this.clearForm();
+                setTimeout(() => {
+                    this.isAuthorized = true;
+                    this.errorMessage = '';
+                }, 4000);
             }
 
         },
+        clearForm(){
+            this.usuario.nome = '';
+                this.usuario.email = '';
+                this.usuario.cidade = '';
+                this.usuario.senha = '';
+                this.usuario.permissao = null;
+        }
     },
 };
 </script>

@@ -2,6 +2,9 @@
     <div class="geralE">
         <h2>Usuário - Edição Perfil</h2>
         <form @submit.prevent="submitForm">
+            <div v-if="showSuccessMessage" class="alert alert-success">
+                Perfil atualizado com sucesso!
+            </div>
             <b-form-group label="Nome" label-for="input-nome">
                 <b-form-input id="input-nome" v-model="usuario.name"></b-form-input>
             </b-form-group>
@@ -21,12 +24,6 @@
             <b-form-group>
                 <b-button type="submit" variant="primary">Salvar</b-button>
                 <b-button type="button" variant="" @click="cancel">Cancelar</b-button>
-                <b-modal v-model="showSuccessModal" id="successModal" title="Perfil Atualizado com Sucesso">
-                    Seu perfil foi atualizado com sucesso!
-                    <template #modal-footer>
-                        <b-button variant="primary" @click="closeSuccessModal">Fechar</b-button>
-                    </template>
-                </b-modal>
             </b-form-group>
         </form>
     </div>
@@ -45,7 +42,7 @@ export default {
             },
             usuarioOriginal: {},
             novaSenha: '',
-            showSuccessModal: false,
+            showSuccessMessage: false,
             successTimeout: null,
         };
     },
@@ -55,7 +52,7 @@ export default {
     methods: {
         async fetchUserData() {
             try {
-                const token = localStorage.getItem("authToken");// Replace with your actual JWT token
+                const token = localStorage.getItem("authToken");
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -84,20 +81,27 @@ export default {
                     name: this.usuario.name,
                     email: this.usuario.email,
                     cidade: this.usuario.cidade,
-                    newPassword: this.novaSenha,
                 };
+
+                if (this.novaSenha.trim() !== '') {
+                    requestBody.newPassword = this.novaSenha;
+                }
 
                 const response = await this.$api.put("/updateProfile", requestBody, config);
                 console.log(response.data);
 
-                this.$store.commit('updateUserData', {
+                this.$store.commit('SET_USER_DATA', {
                     name: this.usuario.name,
                     cidade: this.usuario.cidade,
                 });
 
-                this.showSuccessModal = true;
-                this.successTimeout = setTimeout(this.closeSuccessModal, 2000);
+                this.showSuccessMessage = true;
+                setTimeout(() => {
+                    this.showSuccessMessage = false;
+                }, 3000);
                 this.usuarioOriginal = JSON.parse(JSON.stringify(this.usuario));
+
+                this.novaSenha = '';
 
             } catch (error) {
                 console.error("Erro ao atualizar perfil:", error);
