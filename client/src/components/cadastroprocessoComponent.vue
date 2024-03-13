@@ -5,6 +5,9 @@
             <div v-if="showSuccessMessage" class="alert alert-success">
                 Processo cadastrado com sucesso!
             </div>
+            <div v-if="showErrorMessage" class="alert alert-danger" role="alert">
+                Processo não cadastrado. {{ errorMessage }}
+            </div>
             <b-form-group label="Número do Processo" label-for="num_processo">
                 <b-form-input id="num_processo" v-model="processo.nProcesso" required></b-form-input>
             </b-form-group>
@@ -43,6 +46,8 @@ export default {
             },
             situacoes: [],
             showSuccessMessage: false,
+            showErrorMessage: false,
+            errorMessage: '',
         };
     },
     created() {
@@ -86,7 +91,13 @@ export default {
                 } else {
                     console.error('Erro ao configurar a solicitação:', error.message);
                 }
-                alert(errorMessage);
+                this.errorMessage = errorMessage;
+                this.showErrorMessage = true;
+                setTimeout(() => {
+                    this.showErrorMessage = false;
+                    this.errorMessage = '';
+                }, 4000);
+                this.clearForm();
             }
         },
         clearForm() {

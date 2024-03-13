@@ -17,7 +17,7 @@ export const checkPermission = (allowedRoles: string[]) => {
       console.log("Permissão negada. Retornando erro 403.");
       res
         .status(403)
-        .json({ error: "PERMISSAO NEGADA!! Você não tem permissão para acessar a página ou praticar o ato. :(" });
+        .json({ error: "PERMISSAO NEGADA!! Você não tem permissão para acessar a página ou praticar o ato." });
 
     }
   };

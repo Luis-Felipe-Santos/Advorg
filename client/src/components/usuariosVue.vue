@@ -2,6 +2,9 @@
   <div>
     <h2>Usuários</h2>
     <b-container class="custom-container">
+      <div class="pdf-icon" @click="gerarPDF">
+        <b-icon title="Gerar PDF" class="icon-pdf" icon="file-pdf"></b-icon>
+      </div>
       <b-row class="pesquisas">
         <b-col cols="6" md="3">
           <b-form-input v-model="searchNome" placeholder="Pesquisar por Nome" />
@@ -11,7 +14,16 @@
         </b-col>
       </b-row>
       <div class="table-responsive">
-        <table class="table">
+        <div v-if="editSuccess" class="alert alert-success" role="alert">
+          Usuário editado com sucesso!
+        </div>
+        <div v-if="deleteSuccess" class="alert alert-success" role="alert">
+          Usuário excluído com sucesso!
+        </div>
+        <div v-if="deleteError" class="alert alert-danger" role="alert">
+          Não foi possível excluir o usuário.
+        </div>
+        <table class="table" ref="userTable">
           <thead>
             <tr>
               <th>Nome</th>
@@ -73,7 +85,7 @@
 
     <b-modal id="modal-edicao" size="lg" centered v-model="showEditModal" title="Editar Usuário">
       <b-container>
-        <b-row class="modal-row" >
+        <b-row class="modal-row">
           <b-col md="3">Nome:</b-col>
           <b-col md="9">
             <b-form-input v-model="editedUser.name" />
@@ -102,6 +114,9 @@
 </template>
 
 <script>
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 export default {
   name: "usuariosVue",
   data() {
@@ -114,6 +129,9 @@ export default {
       usuarioParaExcluir: null,
       showEditModal: false,
       editedUser: {},
+      editSuccess: false,
+      deleteSuccess: false,
+      deleteError: false,
     };
   },
   computed: {
@@ -160,7 +178,6 @@ export default {
         } else if (error.request) {
           console.error('Sem resposta do servidor:', error.request);
         } else {
-
           console.error('Erro ao configurar a solicitação:', error.message);
         }
         alert(errorMessage);
@@ -194,12 +211,18 @@ export default {
 
         if (response.status === 200) {
           this.fetchUserData();
+          this.editSuccess = true;
           console.log("Usuário atualizado com sucesso.");
+          setTimeout(() => {
+            this.editSuccess = false;
+          }, 4000);
         } else {
+          this.editSuccess = false;
           console.error("Erro ao atualizar usuário. Status:", response.status);
           console.error("Resposta do servidor:", response.data);
         }
       } catch (error) {
+        this.editSuccess = false;
         console.error("Erro ao atualizar usuário:", error);
       } finally {
         this.showEditModal = false;
@@ -236,25 +259,46 @@ export default {
         if (response.status === 204) {
           const updatedItems = this.items.filter((item) => item.id !== idUsuario);
           this.$set(this, 'items', updatedItems);
+          this.deleteSuccess = true;
           console.log("Usuário excluído com sucesso.");
+          setTimeout(() => {
+            this.deleteSuccess = false;
+          }, 4000);
         } else if (response.status === 200) {
+          this.deleteSuccess = true;
           console.log("Usuário excluído com sucesso.");
         } else {
+          this.deleteSuccess = false;
+          this.deleteError = true;
           console.error("Erro ao excluir usuário. Status:", response.status);
           console.error("Resposta do servidor:", response.data);
         }
       } catch (error) {
+        this.deleteSuccess = false;
+        this.deleteError = true;
         console.error("Erro ao excluir usuário:", error);
       }
-    }
+    },
+    gerarPDF() {
+      const doc = new jsPDF("l");
+
+      doc.text('Lista de Usuários', 14, 10);
+
+      const tableData = this.filteredItems.map(item => [item.name, item.email, item.createdAt, item.permissao, item.userName]);
+
+      doc.autoTable({
+        head: [['Nome', 'Login', 'Cadastro', 'Permissão', 'Cadastrado Por']],
+        body: tableData,
+        startY: 20,
+      });
+
+      doc.save('usuarios.pdf');
+    },
   }
 };
-
 </script>
 
 <style scoped>
-
-
 * {
   padding: 0;
   margin: 0;
@@ -290,7 +334,19 @@ h2 {
   margin-left: 10px;
   cursor: pointer;
 }
+
 .modal-row {
   margin-bottom: 10px;
+}
+
+.pdf-icon {
+  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.icon-pdf {
+  margin-right: 5px;
+  font-size: 30px;
 }
 </style>

@@ -5,6 +5,9 @@
             <div v-if="showSuccessMessage" class="alert alert-success">
                 Perfil atualizado com sucesso!
             </div>
+            <div v-if="showErrorMessage" class="alert alert-danger" role="alert">
+                Dados do perfil não atualizados. {{ errorMessage }}
+            </div>
             <b-form-group label="Nome" label-for="input-nome">
                 <b-form-input id="input-nome" v-model="usuario.name"></b-form-input>
             </b-form-group>
@@ -44,6 +47,8 @@ export default {
             novaSenha: '',
             showSuccessMessage: false,
             successTimeout: null,
+            showErrorMessage: false,
+            errorMessage: '',
         };
     },
     created() {
@@ -119,8 +124,13 @@ export default {
                     // Algo aconteceu ao configurar a solicitação que acionou um erro
                     console.error('Erro ao configurar a solicitação:', error.message);
                 }
-
-                alert(errorMessage);
+                this.errorMessage = errorMessage;
+                this.showErrorMessage = true;
+                setTimeout(() => {
+                    this.showErrorMessage = false;
+                    this.errorMessage = '';
+                }, 4000);
+                this.cancel();
             }
         },
 

@@ -1,59 +1,68 @@
 <template>
   <div>
-      <h2>Processos</h2>
-      <b-container class="custom-container">
-        <b-form>
-          <b-row>
-            <b-col cols="12" sm="6" md="6" lg="3">
-              <b-form-group label="Nº do Processo">
-                <b-form-input v-model="input1"></b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col cols="12" sm="6" md="6" lg="4" class="ml-sm-3 mb-3">
-              <b-form-group label="Nome Autor">
-                <b-form-input v-model="input2"></b-form-input>
-              </b-form-group>
-            </b-col>
-            <b-col cols="12" sm="6" md="6" lg="4">
-              <b-form-group label="Nome Reu">
-                <b-form-input v-model="input3"></b-form-input>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="12" sm="6" md="6" lg="4">
-              <b-form-group label="Data" class="w-100">
-                <b-form-datepicker v-model="selectedDate"
-                  :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }"
-                  class="form-control"></b-form-datepicker>
-              </b-form-group>
-            </b-col>
-            <b-col cols="12" sm="6" md="6" lg="4" class="mb-5">
-              <b-form-group label="Situação">
-                <b-form-input v-model="input4" class="form-control"></b-form-input>
-              </b-form-group>
-            </b-col>
-          </b-row>
-          <b-button @click="submitForm">Buscar</b-button>
-          <b-button class="button2" @click="resetForm">Limpar</b-button>
-        </b-form>
-      </b-container>
+    <h2>Processos</h2>
     <b-container class="custom-container">
+      <b-form>
+        <b-row>
+          <b-col cols="12" sm="6" md="6" lg="3">
+            <b-form-group label="Nº do Processo">
+              <b-form-input v-model="input1"></b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col cols="12" sm="6" md="6" lg="4" class="ml-sm-3 mb-3">
+            <b-form-group label="Nome Autor">
+              <b-form-input v-model="input2"></b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col cols="12" sm="6" md="6" lg="4">
+            <b-form-group label="Nome Reu">
+              <b-form-input v-model="input3"></b-form-input>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="12" sm="6" md="6" lg="4">
+            <b-form-group label="Data" class="w-100">
+              <b-form-datepicker v-model="selectedDate"
+                :date-format-options="{ year: 'numeric', month: '2-digit', day: '2-digit' }"
+                class="form-control"></b-form-datepicker>
+            </b-form-group>
+          </b-col>
+          <b-col cols="12" sm="6" md="6" lg="4" class="mb-5">
+            <b-form-group label="Situação">
+              <b-form-input v-model="input4" class="form-control"></b-form-input>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-button @click="submitForm">Buscar</b-button>
+        <b-button class="button2" @click="resetForm">Limpar</b-button>
+      </b-form>
+    </b-container>
+    <b-container class="custom-container">
+      <div class="pdf-icon" @click="gerarPDF">
+        <b-icon title="Gerar PDF" class="icon-pdf" icon="file-pdf"></b-icon>
+      </div>
       <div v-if="!isAuthorized" class="alert alert-danger" role="alert">
         Você não tem permissão para editar este processo.
       </div>
       <div v-if="!editSuccess" class="alert alert-success" role="alert">
         Processo editado com sucesso!
       </div>
+      <div v-if="!deleteSuccess" class="alert alert-success" role="alert">
+        Processo excluído com sucesso!
+      </div>
+      <div v-if="deleteError" class="alert alert-danger" role="alert">
+        Você não tem permissão para excluir este processo.
+      </div>
       <div class="table-responsive">
-      <b-table striped hover :items="items" :fields="fields">
-        <template v-slot:cell(eventos)="props">
-          <b-icon @click="visualizar(props.item)" class="icon" icon="eye"></b-icon>
-          <b-icon @click="editar(props.item)" class="icon" icon="pencil-square"></b-icon>
-          <b-icon @click="excluir(props.item)" class="icon" icon="trash-fill"></b-icon>
-        </template>
-      </b-table>
-    </div>
+        <b-table ref="processosTable" striped hover :items="items" :fields="fields">
+          <template v-slot:cell(eventos)="props">
+            <b-icon @click="visualizar(props.item)" class="icon" icon="eye"></b-icon>
+            <b-icon @click="editar(props.item)" class="icon" icon="pencil-square"></b-icon>
+            <b-icon @click="excluir(props.item)" class="icon" icon="trash-fill"></b-icon>
+          </template>
+        </b-table>
+      </div>
     </b-container>
     <b-modal id="modal-lg" size="lg" centered v-model="isModalVisible" title="Detalhes do processo"
       @hide="fecharModalVisualizacao">
@@ -127,6 +136,8 @@
 
 <script>
 import { parseISO, format } from "date-fns";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default {
   name: "processosVue",
@@ -144,6 +155,8 @@ export default {
       isModalEditarVisible: false,
       isAuthorized: true,
       editSuccess: true,
+      deleteSuccess: true,
+      deleteError: false,
 
       fields: [
         {
@@ -281,8 +294,8 @@ export default {
           this.isModalEditarVisible = false;
           this.editSuccess = false;
           setTimeout(() => {
-          this.editSuccess = true;
-        }, 4000);
+            this.editSuccess = true;
+          }, 4000);
         }
       } catch (error) {
         console.error("Erro ao editar processo:", error);
@@ -353,6 +366,10 @@ export default {
         if (response.status === 200) {
           this.items = this.items.filter((item) => item.idProcesso !== idProcessoNumber);
           console.log("Processo excluído com sucesso.");
+          this.deleteSuccess = false;
+          setTimeout(() => {
+            this.deleteSuccess = true;
+          }, 4000);
         } else if (response.status === 403) {
           console.error("Permissão negada. Você não tem as permissões necessárias para excluir este processo.");
         } else {
@@ -360,8 +377,30 @@ export default {
         }
       } catch (error) {
         console.error("Erro ao excluir processo:", error);
+        this.deleteError = true;
+        setTimeout(() => {
+          this.deleteError = false;
+        }, 4000);
       }
-    }
+    },
+    gerarPDF() {
+
+      const doc = new jsPDF('l');
+      const processosTableRef = this.$refs.processosTable;
+      doc.text('Lista de Processos', 14, 10);
+
+      if (processosTableRef) {
+        const table = processosTableRef.$el;
+
+        if (table) {
+          const fieldsWithoutEventos = this.fields.filter(field => field.key !== 'eventos');
+          doc.autoTable({ html: table, columns: fieldsWithoutEventos  });
+          doc.save('processos.pdf');
+          return;
+        }
+      }
+      console.error("Não foi possível encontrar a tabela para gerar o PDF.");
+    },
   }
 }
 </script>
@@ -405,5 +444,16 @@ h2 {
 .form-group-processos input,
 .form-group select {
   flex: 1;
+}
+
+.pdf-icon {
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.icon-pdf {
+  margin-right: 5px;
+  font-size: 30px;
+  vertical-align: middle;
 }
 </style>
